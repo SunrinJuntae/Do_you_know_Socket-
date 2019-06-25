@@ -1,5 +1,3 @@
-// test for github
-
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
@@ -81,7 +79,7 @@ int main()
 			hundred();
 
 		game_start = tutorial_wasd();
-		if (i == START) 
+		if (game_start == START) 
 			wasd();
 
 		score_save();
@@ -137,8 +135,8 @@ void rsp()
 		case 2:
 			save_rsp = D;
 			break;
-			default
-				save_rsp = S;
+		default:
+			save_rsp = S;
 			break;
 		}
 
@@ -615,7 +613,7 @@ void end_motion(int x)
 	cursorview(0);
 	Sleep(1000);
 	system("cls");
-	gotoxy(45, 15);		 printf("*****%d개*****", x);
+	gotoxy(45, 15);		 printf("*****%d개********", x);
 	cursorview(0);
 	Sleep(2000);
 }
@@ -624,24 +622,17 @@ int menu()
 {
 	while (1) 
 	{
-		gotoxy(4, 5);
-		printf("        ||         ||    |    ||     |    |           ||||||     | |           |||    |                         \n");
-		gotoxy(4, 6);
-		printf("        | |       | |         | |    |                     |     | |          |   |   |                   \n");
-		gotoxy(4, 7);
-		printf("        |  |     |  |    |    |  |   |    |                |    || |         |     |  |                    \n");
-		gotoxy(4, 8);
-		printf("        |   |   |   |    |    |    | |    |                |     | |          |    |  |                              \n");
-		gotoxy(4, 9);
-		printf("        |     |     |    |    |     ||    |                |     | |           ||||   |                   \n");
-		gotoxy(4, 10);
-		printf("        |     |     |    |    |     ||    |                                      ||||||                          \n");
-		gotoxy(4, 11);
-		printf("                                                                                 ||||||                        \n");
-		gotoxy(45, 16);
-		printf("시작하려면 ENTER\n");
-		gotoxy(35, 17);
-		printf("끝내려면 아래 방향키를 눌러주세요!\n");	
+		gotoxy(0, 1);	printf("============================================= ");
+		gotoxy(0, 2);	printf("********************************************* ");
+
+		gotoxy(0, 5);	printf("********************************************* ");
+		gotoxy(0, 6);	printf("============================================= ");
+
+		gotoxy(8, 10);	printf("-----------------------------");
+		gotoxy(8, 11);	printf(":      ENTER : start !!     :");
+		gotoxy(8, 12);	printf(":      SPACE : exit         :");
+		gotoxy(8, 13);	printf("-----------------------------");
+
 		cursorview(0);
 		int input;
 		input = _getch();
@@ -650,7 +641,7 @@ int menu()
 			input = _getch();
 			switch (input) 
 			{
-			case 80: // ↓
+			case 32: // SPACE
 				input = 0;
 				return input;
 				break;
