@@ -60,7 +60,7 @@ int main()
 	system("color 0F");
 
 	int start = menu(); // if Enter = start
-	int game_start; // start값 랜덤으로 나오게 바꿔서 게임 랜덤 실행 구현 
+	int game_start; // start값 랜덤으로 나오게 바꿔서 게임 랜덤 실행 구현해보장
 
 	if (start == 1) 
 	{
@@ -86,6 +86,62 @@ int main()
 	}
 	system("pause");
 	return 0;
+}
+
+int menu()
+{
+	system("mode con cols=48 lines=36"); // cols = 세로, lines = 가로 
+	while (1)
+	{
+		gotoxy(0, 2);	printf("================================================");
+		gotoxy(0, 3);	printf("ㅇㅇㅇㅇㅇㅇㅇ                    ㅇㅇㅇㅇㅇㅇㅇ");
+		gotoxy(0, 4);   printf("               Mini Game - Party!	    	    ");
+		gotoxy(0, 5);	printf("ㅇㅇㅇㅇㅇㅇㅇ                    ㅇㅇㅇㅇㅇㅇㅇ");
+		gotoxy(0, 6);	printf("================================================");
+
+		gotoxy(6, 9);	printf("------------------------------------");
+		gotoxy(6, 10);	printf(":		    	                 :");
+		gotoxy(6, 11);	printf(":  < 게임 설명 >	                 :");
+		gotoxy(6, 12);	printf(":		    	                 :");
+		gotoxy(6, 13);	printf(":		    	                 :");
+		gotoxy(6, 14);	printf(":		    	                 :");
+		gotoxy(6, 15);	printf(":		    	                 :");
+		gotoxy(6, 16);	printf(":		    	                 :");
+		gotoxy(6, 17);	printf(":		    	                 :");
+		gotoxy(6, 18);	printf(":		    	                 :");
+		gotoxy(6, 19);	printf(":		    	                 :");
+		gotoxy(6, 20);	printf(":		    	                 :");
+		gotoxy(6, 21);	printf(":		    	                 :");
+		gotoxy(6, 22);	printf(":		    	                 :");
+		gotoxy(6, 23);	printf(":		    	                 :");
+		gotoxy(6, 24);	printf(":		    	                 :");
+		gotoxy(6, 25);	printf(":		    	                 :");
+		gotoxy(6, 26);	printf("------------------------------------");
+
+		gotoxy(9, 30);	printf("------------------------------");
+		gotoxy(9, 31);	printf(":       ENTER : start !!     :");
+		gotoxy(9, 32);	printf(":       SPACE : exit         :");
+		gotoxy(9, 33);	printf("------------------------------");
+
+		cursorview(0);
+		int input;
+		input = _getch();
+
+		if (input == 32) // SPACE
+		{
+			system("cls");
+			exit(0);
+		}
+
+		else if (input == 13) // ENTER
+			return 1;
+
+		else
+		{
+			system("cls");
+			continue;
+		}
+	}
 }
 
 void rsp()
@@ -616,47 +672,6 @@ void end_motion(int x)
 	gotoxy(45, 15);		 printf("*****%d개********", x);
 	cursorview(0);
 	Sleep(2000);
-}
-
-int menu()
-{
-	while (1) 
-	{
-		gotoxy(0, 1);	printf("============================================= ");
-		gotoxy(0, 2);	printf("********************************************* ");
-
-		gotoxy(0, 5);	printf("********************************************* ");
-		gotoxy(0, 6);	printf("============================================= ");
-
-		gotoxy(8, 10);	printf("-----------------------------");
-		gotoxy(8, 11);	printf(":      ENTER : start !!     :");
-		gotoxy(8, 12);	printf(":      SPACE : exit         :");
-		gotoxy(8, 13);	printf("-----------------------------");
-
-		cursorview(0);
-		int input;
-		input = _getch();
-		if (input == 224) 
-		{
-			input = _getch();
-			switch (input) 
-			{
-			case 32: // SPACE
-				input = 0;
-				return input;
-				break;
-			}
-		}
-
-		else if (input == 13) // ENTER
-			return 1;
-
-		else 
-		{
-			system("cls");
-			continue;
-		}
-	}
 }
 
 void gotoxy(int x, int y) 
