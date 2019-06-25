@@ -6,8 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define RIGHT 34
-#define TIMEFINGER 31
+#define TIMEFINGER 31 // Use in timing
 
 #define A 97
 #define S 115
@@ -22,7 +21,7 @@ char wasd_made[30] = { 0, };
 int tutorial_rsp(); // Game Tutorial
 int tutorial_timing();
 int tutorial_wasd();
-int tutorial_hundred();
+int tutorial_taza();
 
 int wasd(); // Game - wasd
 void wasd_map();
@@ -39,8 +38,8 @@ void timing_print_finger();
 void timing_print_line(int i);
 void timing_cleanline();
 
-void hundred(); // Game - hundred
-void hundred_map();
+void taza(); // Game - taza
+void taza_map();
 
 void ox(int x); // timing & rsp
 
@@ -51,13 +50,13 @@ int menu();	// Other Functions
 void score_save();
 void check_score();
 
+void textcolor(int color_number);
 void gotoxy(int x, int y); // Win API Functions
 void cursorview(char show);
+void set_gamesize();
 
 int main() 
 {
-	system("mode con cols=110 lines=40");
-	system("color 0F");
 
 	int start = menu(); // if Enter = start
 	int game_start; // start값 랜덤으로 나오게 바꿔서 게임 랜덤 실행 구현해보장
@@ -68,19 +67,31 @@ int main()
 
 		game_start = tutorial_rsp();
 		if (game_start == START)
+		{
+			fflush(stdin);
 			rsp();
+		}
 
 		game_start = tutorial_timing();
 		if (game_start == START)
+		{
+			fflush(stdin);
 			timing();
+		}
 
-		game_start = tutorial_hundred();
+		game_start = tutorial_taza();
 		if (game_start == START)
-			hundred();
+		{
+			fflush(stdin);
+			taza();
+		}
 
 		game_start = tutorial_wasd();
-		if (game_start == START) 
+		if (game_start == START)
+		{
+			fflush(stdin);
 			wasd();
+		}
 
 		score_save();
 	}
@@ -90,38 +101,38 @@ int main()
 
 int menu()
 {
-	system("mode con cols=48 lines=36"); // cols = 세로, lines = 가로 
+	system("mode con cols=48 lines=37"); // cols = 세로, lines = 가로 
 	while (1)
 	{
-		gotoxy(0, 2);	printf("================================================");
-		gotoxy(0, 3);	printf("ㅇㅇㅇㅇㅇㅇㅇ                    ㅇㅇㅇㅇㅇㅇㅇ");
-		gotoxy(0, 4);   printf("               Mini Game - Party!	    	    ");
-		gotoxy(0, 5);	printf("ㅇㅇㅇㅇㅇㅇㅇ                    ㅇㅇㅇㅇㅇㅇㅇ");
-		gotoxy(0, 6);	printf("================================================");
-
-		gotoxy(6, 9);	printf("------------------------------------");
+		gotoxy(0, 2);	textcolor(4);	printf("################################################");
+		gotoxy(0, 4);   textcolor(7);	printf("             < Mini Game - Party >	   	    ");
+		gotoxy(0, 6);	textcolor(4);	printf("################################################"); textcolor(7);
+				
+		gotoxy(6, 9);	textcolor(2);	printf("====================================");	textcolor(7);
 		gotoxy(6, 10);	printf(":		    	                 :");
-		gotoxy(6, 11);	printf(":  < 게임 설명 >	                 :");
-		gotoxy(6, 12);	printf(":		    	                 :");
-		gotoxy(6, 13);	printf(":		    	                 :");
+		gotoxy(6, 11);	printf(":  < 게임 설명 >	                 :"); 
+		gotoxy(6, 12);	printf(":   	                         :");
+		gotoxy(6, 13);	printf(":	◈ 여러 미니게임을 클리어 하자!  :");
 		gotoxy(6, 14);	printf(":		    	                 :");
-		gotoxy(6, 15);	printf(":		    	                 :");
-		gotoxy(6, 16);	printf(":		    	                 :");
-		gotoxy(6, 17);	printf(":		    	                 :");
-		gotoxy(6, 18);	printf(":		    	                 :");
-		gotoxy(6, 19);	printf(":		    	                 :");
+		gotoxy(6, 15);	printf(":	⊙ 채팅을 통한 더 큰 재미!	 :");
+		gotoxy(6, 16);	printf(":  	    	                 :");
+		gotoxy(6, 17);	printf(":  	    	                 :");
+		gotoxy(6, 18);	printf(":  	    	                 :");
+		gotoxy(6, 19);	printf(":	 < 게임 방법 >	    	         :"); 
 		gotoxy(6, 20);	printf(":		    	                 :");
-		gotoxy(6, 21);	printf(":		    	                 :");
-		gotoxy(6, 22);	printf(":		    	                 :");
-		gotoxy(6, 23);	printf(":		    	                 :");
+		gotoxy(6, 21);	printf(":	♤ 매 게임마다 설명 등장!	 :");
+		gotoxy(6, 22);	printf(":	   	                         :");
+		gotoxy(6, 23);	printf(":	◑ 설명을 잘 읽어보자!	 	 :");
 		gotoxy(6, 24);	printf(":		    	                 :");
-		gotoxy(6, 25);	printf(":		    	                 :");
-		gotoxy(6, 26);	printf("------------------------------------");
+		gotoxy(6, 25);	printf(":	※ 난이도는 점점 어려워진다!     :");
+		gotoxy(6, 26);	printf(":		    	                 :");
+		gotoxy(6, 27);	printf(":		    	                 :");
+		gotoxy(6, 28);	textcolor(2);	printf("===================================="); textcolor(7);
 
-		gotoxy(9, 30);	printf("------------------------------");
-		gotoxy(9, 31);	printf(":       ENTER : start !!     :");
-		gotoxy(9, 32);	printf(":       SPACE : exit         :");
-		gotoxy(9, 33);	printf("------------------------------");
+		gotoxy(9, 31);	textcolor(9);	printf("------------------------------"); textcolor(7);
+		gotoxy(9, 32);	printf(":       ENTER : start !!     :");
+		gotoxy(9, 33);	printf(":       SPACE : exit         :");
+		gotoxy(9, 34);	textcolor(9);	printf("------------------------------"); textcolor(7);
 
 		cursorview(0);
 		int input;
@@ -146,10 +157,13 @@ int menu()
 
 void rsp()
 {
+	set_gamesize();
+
 	srand(time(NULL));
 	int i, leftside, rightside, input, check, save_rsp;
 	double start = 0, finish = 0;
 
+	fflush(stdin);
 	start_motion();
 	for (i = 0; i <= 9; i++)
 	{
@@ -157,6 +171,7 @@ void rsp()
 		rsp_map();
 		leftside = rand() % 3 + 1;
 		rightside = rand() % 3 + 1;
+
 		switch (leftside)
 		{
 		case 1:
@@ -166,6 +181,7 @@ void rsp()
 		case 3:
 			rsp_print_p(5, 3); break;
 		}
+
 		switch (rightside)
 		{
 		case 1:
@@ -229,7 +245,7 @@ void rsp()
 void rsp_map()
 {
 	int i;
-	for (i = 0; i <= 39; i++)
+	for (i = 0; i <= 40; i++)
 	{
 		gotoxy(57, i);
 		printf("|");
@@ -342,6 +358,8 @@ void rsp_print_p(int x, int y)
 
 void timing()
 {
+	set_gamesize();
+
 	int i, j, input, speed, real_score = 0;
 	start_motion();
 	for (i = 0; i <= 7; i++)
@@ -360,7 +378,7 @@ void timing()
 			if (_kbhit())
 			{
 				input = _getch();
-				if (j == RIGHT)
+				if (j == 34)
 				{
 					score++;
 					real_score++;
@@ -391,7 +409,7 @@ void timing_print_finger()
 	gotoxy(3, 30);	printf("            ,,,.\n");
 	gotoxy(3, 31);	printf("         ,,. .,.\n");
 	gotoxy(3, 32);	printf(",,,,,..,.    .,,........,.\n");
-	gotoxy(3, 33);	printf("-   ,,.                 .,--\n");  // *******
+	gotoxy(3, 33);	printf("-   ,,.                 .,--"); textcolor(4); printf("=\n"); textcolor(7); // *******
 	gotoxy(3, 34);	printf("-   ,.        .,,,,,,,,,.\n");
 	gotoxy(3, 35);	printf("-   ,.            .-\n");
 	gotoxy(3, 36);	printf("-   ,.        .,,,,.\n");
@@ -401,7 +419,7 @@ void timing_print_finger()
 	gotoxy(79, 30);	printf("             .,,,.\n");
 	gotoxy(79, 31);	printf("            .,. .,,\n");
 	gotoxy(79, 32);	printf("  .,,,,,,,,,,,,    .,..,,,,, \n");
-	gotoxy(79, 33);	printf("--,.                 ,,-   ,\n");
+	gotoxy(79, 33);	textcolor(4); printf("="); textcolor(7); printf("--,.                 ,,-   ,\n");
 	gotoxy(79, 34);	printf("   ,,,,,,,,,,.        .-   ,\n");
 	gotoxy(79, 35);	printf("        -,            .-   ,\n");
 	gotoxy(79, 36);	printf("        .,,,,.        .-   ,\n");
@@ -414,7 +432,7 @@ void timing_print_line(int i)
 {
 
 	gotoxy(TIMEFINGER, i - 1);	printf("                                                ");
-	gotoxy(TIMEFINGER, i);	    printf("------------------------------------------------");	cursorview(0);
+	gotoxy(TIMEFINGER, i);	    printf("  ==============================================");	cursorview(0);
 
 }
 
@@ -428,14 +446,16 @@ void timing_cleanline()
 	}
 }
 
-void hundred()
+void taza()
 {
-	int score_hundred = 0, line_score = 25, times, input, real_score = 0;
+	set_gamesize();
+
+	int score_taza = 0, line_score = 25, times, input, real_score = 0;
 	time_t start, end;
 	time(&start);
 	start_motion();
 	system("cls");
-	hundred_map();
+	taza_map();
 	cursorview(0);
 	while (1) {
 		if (_kbhit())
@@ -443,15 +463,15 @@ void hundred()
 			input = _getch();
 			if (input == A || input == S || input == W || input == D)
 			{
-				score_hundred++;
+				score_taza++;
 				real_score++;
 			}
-			if (score_hundred >= 10)
+			if (score_taza >= 10)
 			{
 				line_score -= 2;
 				gotoxy(20, line_score);	 printf("------------------------------");
 				cursorview(0);
-				score_hundred -= 10;
+				score_taza -= 10;
 			}
 		}
 		time(&end);
@@ -466,7 +486,7 @@ void hundred()
 	score -= real_score / 10;
 }
 
-void hundred_map()
+void taza_map()
 {
 	gotoxy(15, 1);	printf("120--                               |");
 	gotoxy(15, 3);	printf("110--								|");
@@ -485,6 +505,8 @@ void hundred_map()
 
 int wasd()
 {
+	set_gamesize();
+
 	int i, input, print, times, real_score = 0;
 	time_t start, end;
 	time(&start);
@@ -669,7 +691,7 @@ void end_motion(int x)
 	cursorview(0);
 	Sleep(1000);
 	system("cls");
-	gotoxy(45, 15);		 printf("*****%d개********", x);
+	gotoxy(45, 15);		 printf("********%d개********", x);
 	cursorview(0);
 	Sleep(2000);
 }
@@ -702,53 +724,85 @@ void cursorview(char show)//커서숨기기
 	SetConsoleCursorInfo(hConsole, &ConsoleCursor);
 }
 
+void textcolor(int color_number)
+{
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
+}
+
 int tutorial_timing()
 {
-	gotoxy(43, 15);		printf("타이밍을 맞춰라!!");
-	gotoxy(30, 16);		printf("줄이 내려오는 타이밍에 맞춰 \'s\'키를 누르자!!");
-	gotoxy(41, 21);		printf("시작하려면 enter를 누르세요....\n");
+	system("mode con cols=50 lines=25");
+	system("color 0F");
+
+	gotoxy(0, 3);		printf("\t< 타이밍 게임 >");
+	gotoxy(0, 7);		printf("\t말그대로 타이밍을 맞춰봅시다! 	");
+	gotoxy(0, 9);		printf("\t줄이 내려오는 타이밍에 맞춰서..		");
+	gotoxy(0, 11);		printf("\t\'아무 키\'나 눌러주세요!	");
+	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+
 	cursorview(0);
 
-	if (getchar()) 
+	if(_getch())
 		return START;
+
 }
 
 int tutorial_wasd() 
 {
-	gotoxy(43, 15);		printf("사각형 안에 들어있는");
-	gotoxy(45, 16);		printf("글자를 입력해라!!");
-	gotoxy(43, 17);		printf("제한시간은 10초 이다!!");
-	gotoxy(41, 21);		printf("시작하려면 enter를 누르세요....\n");
+	system("mode con cols=50 lines=25");
+	system("color 0F");
+
+	gotoxy(0, 3);		printf("\t< WASD >");
+	gotoxy(0, 7);		printf("\tWASDWASDWASDWASDWASDWASDWASDWASD !!!!	");
+	gotoxy(0, 9);		printf("\t타자를 좋아하는 당신의 마음을 보여주세요!		");
+	gotoxy(0, 11);		printf("\t사각형 안에 있는 글자를 입력하세요!!");
+	gotoxy(0, 15);		printf("\t제한시간 : 10 초 ");
+	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+
 	cursorview(0);
 
-	if (getchar()) 
+	fflush(stdin);
+
+	if (_getch()) 
 		return START;
 }
 
-int tutorial_hundred()
+int tutorial_taza()
 {
-	gotoxy(54, 15);		printf("키를 !!");
-	gotoxy(45, 16);		printf("100에 가깝게 입력해라!!");
-	gotoxy(46, 17);		printf("제한시간은 8초 이다!!");
-	gotoxy(41, 21);		printf("시작하려면 enter를 누르세요....\n");
-	cursorview(0);
-	if (getchar())
-		return START;
+	system("mode con cols=50 lines=25");
+	system("color 0F");
 
+	gotoxy(0, 3);		printf("\t< Taza ( 타자 ) >");
+	gotoxy(0, 7);		printf("\t아무키나 최대한 많이,	");
+	gotoxy(0, 9);		printf("\t그리고 빨리 입력하세요 !!");
+	gotoxy(0, 11);		printf("\t당신의 스트레스를 풀 수 있는 기회!");
+	gotoxy(0, 14);		printf("\t최대 100점까지 획득 가능 !!");
+	gotoxy(0, 16);		printf("\t제한시간 : 8 초 ");
+	gotoxy(0, 21);		printf("\t시작하려면 아무키나 누르세요...");
+	
+	cursorview(0);
+	
+	fflush(stdin);
+
+	if(_getch())
+		return START;
 }
 
 int tutorial_rsp()
 {
-	gotoxy(44, 15);		printf("가위 바위 보!!");
-	gotoxy(45, 16);		printf("왼쪽이 이기면 \'a\'");
-	gotoxy(44, 17);		printf("오른쪽이 이기면 \'d\'");
-	gotoxy(48, 18);		printf("비기면 \'s\'!");
-	gotoxy(45, 19);		printf("2초의 제한시간!!");
-	gotoxy(41, 21);		printf("시작하려면 enter를 누르세요....\n");
-	if (getchar())
+	system("mode con cols=50 lines=25");
+	system("color 0F");
+
+	gotoxy(0, 3);		printf("\t< 가위 바위 보 >");
+	gotoxy(0, 7);		printf("\t왼쪽이 이기면 \'A\'		");
+	gotoxy(0, 9);		printf("\t오른쪽이 이기면 \'D\'		");
+	gotoxy(0, 11);		printf("\t비기면 \'S\'를 눌러주세요!	");
+	gotoxy(0, 15);		printf("\t제한시간 : 2 초	");
+	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+
+	if(_getch())
 		return START;
 }
-
 
 void score_save()
 {
@@ -771,4 +825,10 @@ void score_save()
 	fclose(day_save);
 
 	free(name);
+}
+
+void set_gamesize()
+{
+	system("mode con cols=110 lines=41");
+	system("color 0F");
 }
