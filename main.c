@@ -170,18 +170,6 @@ void rsp()
 	system("cls");
 }
 
-int tutorial_rsp()
-{
-	gotoxy(44, 15);		printf("가위 바위 보!!");
-	gotoxy(45, 16);		printf("왼쪽이 이기면 \'a\'");
-	gotoxy(44, 17);		printf("오른쪽이 이기면 \'d\'");
-	gotoxy(48, 18);		printf("비기면 \'s\'!");
-	gotoxy(45, 19);		printf("2초의 제한시간!!");
-	gotoxy(41, 21);		printf("시작하려면 enter를 누르세요....\n");
-	if (getchar())
-		return START;
-}
-
 void rsp_map()
 {
 	int i;
@@ -340,6 +328,30 @@ void timing()
 	}
 	end_motion(real_score);
 	system("cls");
+}
+
+void timing_print_finger()
+{
+	gotoxy(3, 30);	printf("            ,,,.\n");
+	gotoxy(3, 31);	printf("         ,,. .,.\n");
+	gotoxy(3, 32);	printf(",,,,,..,.    .,,........,.\n");
+	gotoxy(3, 33);	printf("-   ,,.                 .,--\n");  // *******
+	gotoxy(3, 34);	printf("-   ,.        .,,,,,,,,,.\n");
+	gotoxy(3, 35);	printf("-   ,.            .-\n");
+	gotoxy(3, 36);	printf("-   ,.        .,,,,.\n");
+	gotoxy(3, 37);	printf("-   ,.        ....,\n");
+	gotoxy(3, 38);	printf("-,,,-. .,,,....,,,\n"); //26칸
+
+	gotoxy(79, 30);	printf("             .,,,.\n");
+	gotoxy(79, 31);	printf("            .,. .,,\n");
+	gotoxy(79, 32);	printf("  .,,,,,,,,,,,,    .,..,,,,, \n");
+	gotoxy(79, 33);	printf("--,.                 ,,-   ,\n");
+	gotoxy(79, 34);	printf("   ,,,,,,,,,,.        .-   ,\n");
+	gotoxy(79, 35);	printf("        -,            .-   ,\n");
+	gotoxy(79, 36);	printf("        .,,,,.        .-   ,\n");
+	gotoxy(79, 37);	printf("         ,....        .-   ,\n");
+	gotoxy(79, 38);	printf("          ,,,....,,,. .-,,,-\n");
+	cursorview(0);
 }
 
 void timing_print_line(int i)
@@ -717,29 +729,18 @@ int tutorial_hundred()
 
 }
 
-void timing_print_finger() 
+int tutorial_rsp()
 {
-	gotoxy(3, 30);	printf("            ,,,.\n");
-	gotoxy(3, 31);	printf("         ,,. .,.\n");
-	gotoxy(3, 32);	printf(",,,,,..,.    .,,........,.\n");
-	gotoxy(3, 33);	printf("-   ,,.                 .,--\n");  // *******
-	gotoxy(3, 34);	printf("-   ,.        .,,,,,,,,,.\n");
-	gotoxy(3, 35);	printf("-   ,.            .-\n");
-	gotoxy(3, 36);	printf("-   ,.        .,,,,.\n");
-	gotoxy(3, 37);	printf("-   ,.        ....,\n");
-	gotoxy(3, 38);	printf("-,,,-. .,,,....,,,\n"); //26칸
-
-	gotoxy(79, 30);	printf("             .,,,.\n");
-	gotoxy(79, 31);	printf("            .,. .,,\n");
-	gotoxy(79, 32);	printf("  .,,,,,,,,,,,,    .,..,,,,, \n");
-	gotoxy(79, 33);	printf("--,.                 ,,-   ,\n");
-	gotoxy(79, 34);	printf("   ,,,,,,,,,,.        .-   ,\n");
-	gotoxy(79, 35);	printf("        -,            .-   ,\n");
-	gotoxy(79, 36);	printf("        .,,,,.        .-   ,\n");
-	gotoxy(79, 37);	printf("         ,....        .-   ,\n");
-	gotoxy(79, 38);	printf("          ,,,....,,,. .-,,,-\n");
-	cursorview(0);
+	gotoxy(44, 15);		printf("가위 바위 보!!");
+	gotoxy(45, 16);		printf("왼쪽이 이기면 \'a\'");
+	gotoxy(44, 17);		printf("오른쪽이 이기면 \'d\'");
+	gotoxy(48, 18);		printf("비기면 \'s\'!");
+	gotoxy(45, 19);		printf("2초의 제한시간!!");
+	gotoxy(41, 21);		printf("시작하려면 enter를 누르세요....\n");
+	if (getchar())
+		return START;
 }
+
 
 void score_save()
 {
