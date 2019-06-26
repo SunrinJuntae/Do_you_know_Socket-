@@ -365,7 +365,7 @@ void timing()
 	for (i = 0; i <= 7; i++)
 	{
 		system("cls");
-		gotoxy(90, 1);		printf(" 天天天天天天天天天");
+		gotoxy(90, 1);		printf(" 天天天天天天天天天"); 
 		gotoxy(90, 2);		printf(" |                |");
 		gotoxy(90, 3);		printf(" |                |");
 		gotoxy(90, 4);		printf(" |                |");
@@ -475,7 +475,7 @@ void taza()
 			}
 		}
 		time(&end);
-		times = 9 - (int)(difftime(end, start));
+		times = 12 - (int)(difftime(end, start));
 		gotoxy(0, 0);	 printf("%d", times);	cursorview(0);
 		if (times == 0 || line_score < 1)
 		{
