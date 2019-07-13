@@ -7,13 +7,13 @@
 #include <time.h>
 
 #define TIMEFINGER 31 // Use in timing
+
 #define A 97
 #define S 115
 #define D 100
 #define W 119
+
 #define START 2
-#define Xx 32
-#define Ox 32 
 
 int score = 0;
 char wasd_made[30] = { 0, };
@@ -50,8 +50,8 @@ int menu();	// Other Functions
 void score_save();
 void check_score();
 
-void textcolor(int color_number);  // Win API Functions
-void gotoxy(int x, int y);
+void textcolor(int color_number);
+void gotoxy(int x, int y); // Win API Functions
 void cursorview(char show);
 void set_gamesize();
 
@@ -136,7 +136,9 @@ int menu()
 
 		cursorview(0);
 		int input;
-		input = _getch();
+		
+
+		input = _getch();	
 
 		if (input == 32) // SPACE
 		{
@@ -247,7 +249,7 @@ void rsp_map()
 	int i;
 	for (i = 0; i <= 40; i++)
 	{
-		gotoxy(55, i);
+		gotoxy(57, i);
 		printf("|");
 	}
 }
@@ -365,7 +367,7 @@ void timing()
 	for (i = 0; i <= 7; i++)
 	{
 		system("cls");
-		gotoxy(90, 1);		printf(" 天天天天天天天天天"); 
+		gotoxy(90, 1);		printf(" 天天天天天天天天天");
 		gotoxy(90, 2);		printf(" |                |");
 		gotoxy(90, 3);		printf(" |                |");
 		gotoxy(90, 4);		printf(" |                |");
@@ -450,7 +452,7 @@ void taza()
 {
 	set_gamesize();
 
-	int score_taza = 0, line_score = 25, times, input, real_score = 0;
+	int score_taza = 0, line_score = 25, times, real_score = 0;
 	time_t start, end;
 	time(&start);
 	start_motion();
@@ -460,12 +462,10 @@ void taza()
 	while (1) {
 		if (_kbhit())
 		{
-			input = _getch();
-			if (input == A || input == S || input == W || input == D)
-			{
-				score_taza++;
-				real_score++;
-			}
+			_getch();
+			score_taza++;
+			real_score++;
+
 			if (score_taza >= 10)
 			{
 				line_score -= 2;
@@ -475,7 +475,7 @@ void taza()
 			}
 		}
 		time(&end);
-		times = 12 - (int)(difftime(end, start));
+		times = 9 - (int)(difftime(end, start));
 		gotoxy(0, 0);	 printf("%d", times);	cursorview(0);
 		if (times == 0 || line_score < 1)
 		{
@@ -597,74 +597,75 @@ void ox(int x)
 	if (x == 1)
 	{
 		system("color 0B");
-		gotoxy(Ox, 4);	printf("              ...;;;;;;... \n");
-		gotoxy(Ox, 5);	printf("           -;;;:~,.   ..-~;;;:, \n");
-		gotoxy(Ox, 6);	printf("         .:;;~.               ,:;;~ \n");
-		gotoxy(Ox, 7);	printf("       :;;.                     -;;- \n");
-		gotoxy(Ox, 8);	printf("     ,;;,                         -;;.\n");
-		gotoxy(Ox, 9);	printf("    ~;~                             ;;, \n");
-		gotoxy(Ox, 10);	printf("   :;-                               ~;- \n");
-		gotoxy(Ox, 11);	printf("   ~;,                                 ~;, \n");
-		gotoxy(Ox, 12);	printf("  -;-              -:;;;;;;:,            :;. \n");
-		gotoxy(Ox, 13);	printf("  .;~           .:;;~..  .,:;;~           ;: \n");
-		gotoxy(Ox, 14);	printf("  :;.          -;;.          -;;.         -;- \n");
-		gotoxy(Ox, 15);	printf(" .;-          -;~              :;.         :; \n");
-		gotoxy(Ox, 16);	printf(" ~;.         ,;~                ;;         -;. \n");
-		gotoxy(Ox, 17);	printf(" ::          ;:                 .;~        .;- \n");
-		gotoxy(Ox, 18);	printf(".;~         ,;-                  :;         :: \n");
-		gotoxy(Ox, 19);	printf(".;-         ~;                   -;.        :; \n");
-		gotoxy(Ox, 20);	printf(",;-         ~;                   .;.        :; \n");
-		gotoxy(Ox, 21);	printf(".;-         ~;                   -;.        :; \n");
-		gotoxy(Ox, 22);	printf(".;~         ,;-                  :;         ;: \n");
-		gotoxy(Ox, 23);	printf(" ::          ;:                 .;~        .;- \n");
-		gotoxy(Ox, 24);	printf(" ~;.         ,;~                ;;         -;. \n");
-		gotoxy(Ox, 25);	printf(" .;-          -;~             .:;.         :; \n");
-		gotoxy(Ox, 26);	printf("  ~;.          ,;:,          -;;.         -;, \n");
-		gotoxy(Ox, 27);	printf("  .;:           .~;;~,....-:;;-           ;: \n");
-		gotoxy(Ox, 28);	printf("   -;-             --:;;;;;;~             :;. \n");
-		gotoxy(Ox, 29);	printf("    ~;,                                 ~;, \n");
-		gotoxy(Ox, 30);	printf("     ~;-                               ~;, \n");
-		gotoxy(Ox, 31);	printf("      ~;~                            .:;, \n");
-		gotoxy(Ox, 32);	printf("       ,;;,                         ~;:. \n");
-		gotoxy(Ox, 33);	printf("        ~;:,                     -;;- \n");
-		gotoxy(Ox, 34);	printf("         .~;;~,               ,:;;- \n");
-		gotoxy(Ox, 35);	printf("           .-:;;:~-,.....,,-~:;;~, \n");
-		gotoxy(Ox, 36);	printf("               ,-~:;;;;;;;;;:~-.  \n");
+		gotoxy(25, 4);	printf("              ...;;;;;;... \n");
+		gotoxy(25, 5);	printf("           -;;;:~,.   ..-~;;;:, \n");
+		gotoxy(25, 6);	printf("         .:;;~.               ,:;;~ \n");
+		gotoxy(25, 7);	printf("       :;;.                     -;;- \n");
+		gotoxy(25, 8);	printf("     ,;;,                         -;;.\n");
+		gotoxy(25, 9);	printf("    ~;~                             ;;, \n");
+		gotoxy(25, 10);	printf("   :;-                               ~;- \n");
+		gotoxy(25, 11);	printf("   ~;,                                 ~;, \n");
+		gotoxy(25, 12);	printf("  -;-              -:;;;;;;:,            :;. \n");
+		gotoxy(25, 13);	printf("  .;~           .:;;~..  .,:;;~           ;: \n");
+		gotoxy(25, 14);	printf("  :;.          -;;.          -;;.         -;- \n");
+		gotoxy(25, 15);	printf(" .;-          -;~              :;.         :; \n");
+		gotoxy(25, 16);	printf(" ~;.         ,;~                ;;         -;. \n");
+		gotoxy(25, 17);	printf(" ::          ;:                 .;~        .;- \n");
+		gotoxy(25, 18);	printf(".;~         ,;-                  :;         :: \n");
+		gotoxy(25, 19);	printf(".;-         ~;                   -;.        :; \n");
+		gotoxy(25, 20);	printf(",;-         ~;                   .;.        :; \n");
+		gotoxy(25, 21);	printf(".;-         ~;                   -;.        :; \n");
+		gotoxy(25, 22);	printf(".;~         ,;-                  :;         ;: \n");
+		gotoxy(25, 23);	printf(" ::          ;:                 .;~        .;- \n");
+		gotoxy(25, 24);	printf(" ~;.         ,;~                ;;         -;. \n");
+		gotoxy(25, 25);	printf(" .;-          -;~             .:;.         :; \n");
+		gotoxy(25, 26);	printf("  ~;.          ,;:,          -;;.         -;, \n");
+		gotoxy(25, 27);	printf("  .;:           .~;;~,....-:;;-           ;: \n");
+		gotoxy(25, 28);	printf("   -;-             --:;;;;;;~             :;. \n");
+		gotoxy(25, 29);	printf("    ~;,                                 ~;, \n");
+		gotoxy(25, 30);	printf("     ~;-                               ~;, \n");
+		gotoxy(25, 31);	printf("      ~;~                            .:;, \n");
+		gotoxy(25, 32);	printf("       ,;;,                         ~;:. \n");
+		gotoxy(25, 33);	printf("        ~;:,                     -;;- \n");
+		gotoxy(25, 34);	printf("         .~;;~,               ,:;;- \n");
+		gotoxy(25, 35);	printf("           .-:;;:~-,.....,,-~:;;~, \n");
+		gotoxy(25, 36);	printf("               ,-~:;;;;;;;;;:~-.  \n");
+
 	}
 	else
 	{
 		system("color 0E");
-		gotoxy(Xx, 4);	printf("  :;~ .:;~                          ,;;, ,;;.\n");
-		gotoxy(Xx, 5);	printf(" .;~    -;:                        ~;~    .;~ \n");
-		gotoxy(Xx, 6);	printf(" .;-     .;;,                    .;;,     .;~\n");
-		gotoxy(Xx, 7);	printf(" :;,      ~;~                  ,;:.      :;.\n");
-		gotoxy(Xx, 8);	printf("  :;~      ,;;                ~;~      ,;;. \n");
-		gotoxy(Xx, 9);	printf("   -;:      .;;,            .;;,      ~;:\n");
-		gotoxy(Xx, 10);	printf("    .;;,      ~;~          ,;;.      :;-  \n");
-		gotoxy(Xx, 11);	printf("      :;~      ,;;.       ~;~      ,;;.\n");
-		gotoxy(Xx, 12);	printf("       -;:      .;;,    .;;,      ~;:\n");
-		gotoxy(Xx, 13);	printf("        .;;,      ~;~  -;;.      :;-\n");
-		gotoxy(Xx, 14);	printf("          :;~      ,;;:;~      ,;;.\n");
-		gotoxy(Xx, 15);	printf("           -;:      .;;,      ~;:\n");
-		gotoxy(Xx, 16);	printf("            .;;,            .:;-\n");
-		gotoxy(Xx, 17);	printf("              :;-          ,;;.\n");
-		gotoxy(Xx, 18);	printf("               -;:        ~;~\n");
-		gotoxy(Xx, 19);	printf("               -;:        ~;:\n");
-		gotoxy(Xx, 20);	printf("              ~;~          ,;:. \n");
-		gotoxy(Xx, 21);	printf("            .;;,            .:;-\n");
-		gotoxy(Xx, 22);	printf("           -;:.     .:;,      ~;~\n");
-		gotoxy(Xx, 23);	printf("          :;~      ,;;~;~      ,;:.\n");
-		gotoxy(Xx, 24);	printf("        .:;,      ~;~  -;:.     .:;- \n");
-		gotoxy(Xx, 25);	printf("       -;:.     .:;-    .;;,      ~;~ \n");
-		gotoxy(Xx, 26);	printf("      ~;~      ,;:.       ~;~      ,;:. \n");
-		gotoxy(Xx, 27);	printf("    .:;,      ~;~          -;:.     .:;- \n");
-		gotoxy(Xx, 28);	printf("   -;:.     .:;,            .:;,      ~;~ \n");
-		gotoxy(Xx, 29);	printf("  ~;~      ,;;.               ~;~      ,;:. \n");
-		gotoxy(Xx, 30);	printf(" :;,      ~;~                  -;:.     .:;. \n");
-		gotoxy(Xx, 31);	printf(".;-     .:;,                    .:;,     .;~\n");
-		gotoxy(Xx, 32);	printf(".;~    -;:.                       ~;~    .;~ \n");
-		gotoxy(Xx, 33);	printf(" ~;-.,~;~                          ,;:,.-:;.\n");
-		gotoxy(Xx, 34);	printf("  -:;;:,                            .~;;;~.\n");
+		gotoxy(25, 4);	printf("  :;~ .:;~                          ,;;, ,;;.\n");
+		gotoxy(25, 5);	printf(" .;~    -;:                        ~;~    .;~ \n");
+		gotoxy(25, 6);	printf(" .;-     .;;,                    .;;,     .;~\n");
+		gotoxy(25, 7);	printf(" :;,      ~;~                  ,;:.      :;.\n");
+		gotoxy(25, 8);	printf("  :;~      ,;;                ~;~      ,;;. \n");
+		gotoxy(25, 9);	printf("   -;:      .;;,            .;;,      ~;:\n");
+		gotoxy(25, 10);	printf("    .;;,      ~;~          ,;;.      :;-  \n");
+		gotoxy(25, 11);	printf("      :;~      ,;;.       ~;~      ,;;.\n");
+		gotoxy(25, 12);	printf("       -;:      .;;,    .;;,      ~;:\n");
+		gotoxy(25, 13);	printf("        .;;,      ~;~  -;;.      :;-\n");
+		gotoxy(25, 14);	printf("          :;~      ,;;:;~      ,;;.\n");
+		gotoxy(25, 15);	printf("           -;:      .;;,      ~;:\n");
+		gotoxy(25, 16);	printf("            .;;,            .:;-\n");
+		gotoxy(25, 17);	printf("              :;-          ,;;.\n");
+		gotoxy(25, 18);	printf("               -;:        ~;~\n");
+		gotoxy(25, 19);	printf("               -;:        ~;:\n");
+		gotoxy(25, 20);	printf("              ~;~          ,;:. \n");
+		gotoxy(25, 21);	printf("            .;;,            .:;-\n");
+		gotoxy(25, 22);	printf("           -;:.     .:;,      ~;~\n");
+		gotoxy(25, 23);	printf("          :;~      ,;;~;~      ,;:.\n");
+		gotoxy(25, 24);	printf("        .:;,      ~;~  -;:.     .:;- \n");
+		gotoxy(25, 25);	printf("       -;:.     .:;-    .;;,      ~;~ \n");
+		gotoxy(25, 26);	printf("      ~;~      ,;:.       ~;~      ,;:. \n");
+		gotoxy(25, 27);	printf("    .:;,      ~;~          -;:.     .:;- \n");
+		gotoxy(25, 28);	printf("   -;:.     .:;,            .:;,      ~;~ \n");
+		gotoxy(25, 29);	printf("  ~;~      ,;;.               ~;~      ,;:. \n");
+		gotoxy(25, 30);	printf(" :;,      ~;~                  -;:.     .:;. \n");
+		gotoxy(25, 31);	printf(".;-     .:;,                    .:;,     .;~\n");
+		gotoxy(25, 32);	printf(".;~    -;:.                       ~;~    .;~ \n");
+		gotoxy(25, 33);	printf(" ~;-.,~;~                          ,;:,.-:;.\n");
+		gotoxy(25, 34);	printf("  -:;;:,                            .~;;;~.\n");
 	}
 	cursorview(0);
 	Sleep(1000);
@@ -672,12 +673,12 @@ void ox(int x)
 }
 
 void start_motion()
-{
+{	
 	int i = 0;
 	system("cls");
 	for (i = 3; i > 0; i--)
 	{
-		gotoxy(53, 18);	 printf("%d", i);
+		gotoxy(50, 10);	 printf("%d", i);
 		cursorview(0);
 		Sleep(1000);
 	}
@@ -819,8 +820,7 @@ void score_save()
 
 	day_save = fopen("check_point.txt", "a+");
 
-	fprintf(day_save, "%s: %d薄   %d-%d-%d %d:%d:%d\n\n\n", name, score, tm.tm_year + 1900, 
-		tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	fprintf(day_save, "%s: %d薄   %d-%d-%d %d:%d:%d\n\n\n", name, score, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
 	fclose(day_save);
 
