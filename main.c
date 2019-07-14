@@ -1,12 +1,14 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define WIN32_LEAN_AND_MEAN
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
+#include <Winsock2.h>
 #include <stdio.h>
-#include <windows.h>
 #include <conio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <Winsock2.h>
-
+#include <stdbool.h>
+#include <windows.h>
 
 #define TIMEFINGER 31 // Use in timing
 #define A 97
@@ -52,7 +54,7 @@ void ox(int x); // timing & rsp
 void start_motion(); // all game
 void end_motion(int x);
 
-int menu();	// Other Functions
+int menu();   // Other Functions
 void score_save();
 void check_score();
 
@@ -61,59 +63,59 @@ void gotoxy(int x, int y);
 void cursorview(char show);
 void set_gamesize();
 
-int sock_ready();
+int sock_main(int flag);
 int chatting_COM0(SOCKET hCOM1);
-void chatting_COM1(SOCKET hCOM0);
+int chatting_COM1(SOCKET hCOM0);
 void sock_clean(SOCKET hSock, SOCKET hListen);
-void sock_score_COM0(SOCKET hCOM0, int flag);
-void sock_score_COM1(SOCKET hCOM0, int flag);
-
+int sock_score_COM(SOCKET hCOM, int flag);
+int flag_com();
 
 int main()
 {
 
 	int start = menu(); // if Enter = start
 	int game_start; // start값 랜덤으로 나오게 바꿔서 게임 랜덤 실행 구현해보장
-	int flag;
-	sock_ready();
-	
+	int flag = 0;
+	flag = flag_com();
+
 	if (start == 1)
 	{
 		system("cls");
-		if (flag == 0) {
-			chatting_COM0(hSock);
-		}
-		else if (flag == 1) {
-			chatting_COM1(hSock);
-		}
 		game_start = tutorial_rsp();
 		if (game_start == START)
 		{
 			fflush(stdin);
-			rsp();
+			//rsp();
+
 		}
 
 		game_start = tutorial_timing();
 		if (game_start == START)
 		{
 			fflush(stdin);
-			timing();
+			//timing();
 		}
 
 		game_start = tutorial_taza();
 		if (game_start == START)
 		{
 			fflush(stdin);
-			taza();
+			//taza();
 		}
 
 		game_start = tutorial_wasd();
 		if (game_start == START)
 		{
 			fflush(stdin);
-			wasd();
+			//wasd();
 		}
-		(flag == 0) ? sock_score_COM0(hSock, flag) : sock_score_COM1(hSock, flag);
+		int fin = sock_main(flag);
+		if (fin == TRUE) {
+			printf("YOU WIN!!!");
+		}
+		else {
+			printf("YOU LOSE....");
+		}
 		score_save();
 	}
 
@@ -127,35 +129,35 @@ int menu()
 	system("mode con cols=48 lines=37"); // cols = 세로, lines = 가로 
 	while (1)
 	{
-		gotoxy(0, 2);	textcolor(4);	printf("################################################");
-		gotoxy(0, 4);   textcolor(7);	printf("             < Mini Game - Party >	   	    ");
-		gotoxy(0, 6);	textcolor(4);	printf("################################################"); textcolor(7);
+		gotoxy(0, 2);   textcolor(4);   printf("################################################");
+		gotoxy(0, 4);   textcolor(7);   printf("             < Mini Game - Party >             ");
+		gotoxy(0, 6);   textcolor(4);   printf("################################################"); textcolor(7);
 
-		gotoxy(6, 9);	textcolor(2);	printf("====================================");	textcolor(7);
-		gotoxy(6, 10);	printf(":		    	                 :");
-		gotoxy(6, 11);	printf(":  < 게임 설명 >	                 :");
-		gotoxy(6, 12);	printf(":   	                         :");
-		gotoxy(6, 13);	printf(":	◈ 여러 미니게임을 클리어 하자!  :");
-		gotoxy(6, 14);	printf(":		    	                 :");
-		gotoxy(6, 15);	printf(":	⊙ 채팅을 통한 더 큰 재미!	 :");
-		gotoxy(6, 16);	printf(":  	    	                 :");
-		gotoxy(6, 17);	printf(":  	    	                 :");
-		gotoxy(6, 18);	printf(":  	    	                 :");
-		gotoxy(6, 19);	printf(":	 < 게임 방법 >	    	         :");
-		gotoxy(6, 20);	printf(":		    	                 :");
-		gotoxy(6, 21);	printf(":	♤ 매 게임마다 설명 등장!	 :");
-		gotoxy(6, 22);	printf(":	   	                         :");
-		gotoxy(6, 23);	printf(":	◑ 설명을 잘 읽어보자!	 	 :");
-		gotoxy(6, 24);	printf(":		    	                 :");
-		gotoxy(6, 25);	printf(":	※ 난이도는 점점 어려워진다!     :");
-		gotoxy(6, 26);	printf(":		    	                 :");
-		gotoxy(6, 27);	printf(":		    	                 :");
-		gotoxy(6, 28);	textcolor(2);	printf("===================================="); textcolor(7);
+		gotoxy(6, 9);   textcolor(2);   printf("====================================");   textcolor(7);
+		gotoxy(6, 10);   printf(":                              :");
+		gotoxy(6, 11);   printf(":  < 게임 설명 >                    :");
+		gotoxy(6, 12);   printf(":                               :");
+		gotoxy(6, 13);   printf(":   ◈ 여러 미니게임을 클리어 하자!  :");
+		gotoxy(6, 14);   printf(":                              :");
+		gotoxy(6, 15);   printf(":   ⊙ 채팅을 통한 더 큰 재미!    :");
+		gotoxy(6, 16);   printf(":                             :");
+		gotoxy(6, 17);   printf(":                             :");
+		gotoxy(6, 18);   printf(":                             :");
+		gotoxy(6, 19);   printf(":    < 게임 방법 >                   :");
+		gotoxy(6, 20);   printf(":                              :");
+		gotoxy(6, 21);   printf(":   ♤ 매 게임마다 설명 등장!    :");
+		gotoxy(6, 22);   printf(":                                  :");
+		gotoxy(6, 23);   printf(":   ◑ 설명을 잘 읽어보자!        :");
+		gotoxy(6, 24);   printf(":                              :");
+		gotoxy(6, 25);   printf(":   ※ 난이도는 점점 어려워진다!     :");
+		gotoxy(6, 26);   printf(":                              :");
+		gotoxy(6, 27);   printf(":                              :");
+		gotoxy(6, 28);   textcolor(2);   printf("===================================="); textcolor(7);
 
-		gotoxy(9, 31);	textcolor(9);	printf("------------------------------"); textcolor(7);
-		gotoxy(9, 32);	printf(":       ENTER : start !!     :");
-		gotoxy(9, 33);	printf(":       SPACE : exit         :");
-		gotoxy(9, 34);	textcolor(9);	printf("------------------------------"); textcolor(7);
+		gotoxy(9, 31);   textcolor(9);   printf("------------------------------"); textcolor(7);
+		gotoxy(9, 32);   printf(":       ENTER : start !!     :");
+		gotoxy(9, 33);   printf(":       SPACE : exit         :");
+		gotoxy(9, 34);   textcolor(9);   printf("------------------------------"); textcolor(7);
 
 		cursorview(0);
 		int input;
@@ -388,13 +390,13 @@ void timing()
 	for (i = 0; i <= 7; i++)
 	{
 		system("cls");
-		gotoxy(90, 1);		printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
-		gotoxy(90, 2);		printf(" |                |");
-		gotoxy(90, 3);		printf(" |                |");
-		gotoxy(90, 4);		printf(" |                |");
-		gotoxy(90, 5);		printf(" |                |");
-		gotoxy(90, 6);		printf(" |                |");
-		gotoxy(90, 7);		printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+		gotoxy(90, 1);      printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+		gotoxy(90, 2);      printf(" |                |");
+		gotoxy(90, 3);      printf(" |                |");
+		gotoxy(90, 4);      printf(" |                |");
+		gotoxy(90, 5);      printf(" |                |");
+		gotoxy(90, 6);      printf(" |                |");
+		gotoxy(90, 7);      printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
 		for (j = 0; j <= 37; j++)
 		{
 			timing_print_finger();
@@ -420,7 +422,7 @@ void timing()
 			timing_print_line(j);
 			speed = 70 - i * 8;
 			Sleep(speed);
-			gotoxy(100, 4);	 printf("%d", real_score);	cursorview(0);
+			gotoxy(100, 4);    printf("%d", real_score);   cursorview(0);
 		}
 	}
 	end_motion(real_score);
@@ -429,33 +431,33 @@ void timing()
 
 void timing_print_finger()
 {
-	gotoxy(3, 30);	printf("            ,,,.\n");
-	gotoxy(3, 31);	printf("         ,,. .,.\n");
-	gotoxy(3, 32);	printf(",,,,,..,.    .,,........,.\n");
-	gotoxy(3, 33);	printf("-   ,,.                 .,--"); textcolor(4); printf("=\n"); textcolor(7); // *******
-	gotoxy(3, 34);	printf("-   ,.        .,,,,,,,,,.\n");
-	gotoxy(3, 35);	printf("-   ,.            .-\n");
-	gotoxy(3, 36);	printf("-   ,.        .,,,,.\n");
-	gotoxy(3, 37);	printf("-   ,.        ....,\n");
-	gotoxy(3, 38);	printf("-,,,-. .,,,....,,,\n"); //26칸
+	gotoxy(3, 30);   printf("            ,,,.\n");
+	gotoxy(3, 31);   printf("         ,,. .,.\n");
+	gotoxy(3, 32);   printf(",,,,,..,.    .,,........,.\n");
+	gotoxy(3, 33);   printf("-   ,,.                 .,--"); textcolor(4); printf("=\n"); textcolor(7); // *******
+	gotoxy(3, 34);   printf("-   ,.        .,,,,,,,,,.\n");
+	gotoxy(3, 35);   printf("-   ,.            .-\n");
+	gotoxy(3, 36);   printf("-   ,.        .,,,,.\n");
+	gotoxy(3, 37);   printf("-   ,.        ....,\n");
+	gotoxy(3, 38);   printf("-,,,-. .,,,....,,,\n"); //26칸
 
-	gotoxy(79, 30);	printf("             .,,,.\n");
-	gotoxy(79, 31);	printf("            .,. .,,\n");
-	gotoxy(79, 32);	printf("  .,,,,,,,,,,,,    .,..,,,,, \n");
-	gotoxy(79, 33);	textcolor(4); printf("="); textcolor(7); printf("--,.                 ,,-   ,\n");
-	gotoxy(79, 34);	printf("   ,,,,,,,,,,.        .-   ,\n");
-	gotoxy(79, 35);	printf("        -,            .-   ,\n");
-	gotoxy(79, 36);	printf("        .,,,,.        .-   ,\n");
-	gotoxy(79, 37);	printf("         ,....        .-   ,\n");
-	gotoxy(79, 38);	printf("          ,,,....,,,. .-,,,-\n");
+	gotoxy(79, 30);   printf("             .,,,.\n");
+	gotoxy(79, 31);   printf("            .,. .,,\n");
+	gotoxy(79, 32);   printf("  .,,,,,,,,,,,,    .,..,,,,, \n");
+	gotoxy(79, 33);   textcolor(4); printf("="); textcolor(7); printf("--,.                 ,,-   ,\n");
+	gotoxy(79, 34);   printf("   ,,,,,,,,,,.        .-   ,\n");
+	gotoxy(79, 35);   printf("        -,            .-   ,\n");
+	gotoxy(79, 36);   printf("        .,,,,.        .-   ,\n");
+	gotoxy(79, 37);   printf("         ,....        .-   ,\n");
+	gotoxy(79, 38);   printf("          ,,,....,,,. .-,,,-\n");
 	cursorview(0);
 }
 
 void timing_print_line(int i)
 {
 
-	gotoxy(TIMEFINGER, i - 1);	printf("                                                ");
-	gotoxy(TIMEFINGER, i);	    printf("  ==============================================");	cursorview(0);
+	gotoxy(TIMEFINGER, i - 1);   printf("                                                ");
+	gotoxy(TIMEFINGER, i);       printf("  ==============================================");   cursorview(0);
 
 }
 
@@ -490,14 +492,14 @@ void taza()
 			if (score_taza >= 10)
 			{
 				line_score -= 2;
-				gotoxy(20, line_score);	 printf("------------------------------");
+				gotoxy(20, line_score);    printf("------------------------------");
 				cursorview(0);
 				score_taza -= 10;
 			}
 		}
 		time(&end);
 		times = 12 - (int)(difftime(end, start));
-		gotoxy(0, 0);	 printf("%d", times);	cursorview(0);
+		gotoxy(0, 0);    printf("%d", times);   cursorview(0);
 		if (times == 0 || line_score < 1)
 		{
 			end_motion(real_score);
@@ -509,19 +511,19 @@ void taza()
 
 void taza_map()
 {
-	gotoxy(15, 1);	printf("120--                               |");
-	gotoxy(15, 3);	printf("110--								|");
-	gotoxy(15, 5);  printf("100--								|");
-	gotoxy(15, 7);	printf(" 90--								|");
-	gotoxy(15, 9);	printf(" 80--								|");
-	gotoxy(15, 11);	printf(" 70--								|");
-	gotoxy(15, 13);	printf(" 60--								|");
-	gotoxy(15, 15);	printf(" 50--								|");
-	gotoxy(15, 17);	printf(" 40--								|");
-	gotoxy(15, 19);	printf(" 30--								|");
-	gotoxy(15, 21);	printf(" 20--								|");
-	gotoxy(15, 23);	printf(" 10--								|");
-	gotoxy(15, 25);	printf(" 00---------------------------------|\n");
+	gotoxy(15, 1);   printf("120--                               |");
+	gotoxy(15, 3);   printf("110--                        |");
+	gotoxy(15, 5);  printf("100--                        |");
+	gotoxy(15, 7);   printf(" 90--                        |");
+	gotoxy(15, 9);   printf(" 80--                        |");
+	gotoxy(15, 11);   printf(" 70--                        |");
+	gotoxy(15, 13);   printf(" 60--                        |");
+	gotoxy(15, 15);   printf(" 50--                        |");
+	gotoxy(15, 17);   printf(" 40--                        |");
+	gotoxy(15, 19);   printf(" 30--                        |");
+	gotoxy(15, 21);   printf(" 20--                        |");
+	gotoxy(15, 23);   printf(" 10--                        |");
+	gotoxy(15, 25);   printf(" 00---------------------------------|\n");
 }
 
 int wasd()
@@ -537,9 +539,9 @@ int wasd()
 	wasd_make();
 	for (i = 0; i < 20; i++)
 	{
-		gotoxy(30, 13);	printf("%c", wasd_made[i]);
-		gotoxy(57, 13);	printf("%c", wasd_made[i + 1]);
-		gotoxy(80, 13);	printf("%c", wasd_made[i + 2]);
+		gotoxy(30, 13);   printf("%c", wasd_made[i]);
+		gotoxy(57, 13);   printf("%c", wasd_made[i + 1]);
+		gotoxy(80, 13);   printf("%c", wasd_made[i + 2]);
 		print = wasd_made[i + 1];
 		while (1) {
 			if (_kbhit())
@@ -568,7 +570,7 @@ int wasd()
 
 			time(&end);
 			times = 15 - (int)(difftime(end, start));
-			gotoxy(0, 0);	 printf("%d", times);	cursorview(0);
+			gotoxy(0, 0);    printf("%d", times);   cursorview(0);
 
 			if (times == 0)
 				break;
@@ -582,13 +584,13 @@ int wasd()
 
 void wasd_map()
 {
-	gotoxy(48, 10);		printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
-	gotoxy(48, 11);		printf(" |                |");
-	gotoxy(48, 12);		printf(" |                |");
-	gotoxy(48, 13);		printf(" |                |");
-	gotoxy(48, 14);		printf(" |                |");
-	gotoxy(48, 15);		printf(" |                |");
-	gotoxy(48, 16);		printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+	gotoxy(48, 10);      printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
+	gotoxy(48, 11);      printf(" |                |");
+	gotoxy(48, 12);      printf(" |                |");
+	gotoxy(48, 13);      printf(" |                |");
+	gotoxy(48, 14);      printf(" |                |");
+	gotoxy(48, 15);      printf(" |                |");
+	gotoxy(48, 16);      printf(" ㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
 }
 
 void wasd_make()
@@ -600,13 +602,13 @@ void wasd_make()
 		y = rand() % 4 + 1;
 		switch (y) {
 		case 1:
-			x = A;	break;
+			x = A;   break;
 		case 2:
-			x = S;	break;
+			x = S;   break;
 		case 3:
-			x = D;	break;
+			x = D;   break;
 		case 4:
-			x = W;	break;
+			x = W;   break;
 		}
 		wasd_made[i] = x;
 	}
@@ -618,74 +620,74 @@ void ox(int x)
 	if (x == 1)
 	{
 		system("color 0B");
-		gotoxy(Ox, 4);	printf("              ...;;;;;;... \n");
-		gotoxy(Ox, 5);	printf("           -;;;:~,.   ..-~;;;:, \n");
-		gotoxy(Ox, 6);	printf("         .:;;~.               ,:;;~ \n");
-		gotoxy(Ox, 7);	printf("       :;;.                     -;;- \n");
-		gotoxy(Ox, 8);	printf("     ,;;,                         -;;.\n");
-		gotoxy(Ox, 9);	printf("    ~;~                             ;;, \n");
-		gotoxy(Ox, 10);	printf("   :;-                               ~;- \n");
-		gotoxy(Ox, 11);	printf("   ~;,                                 ~;, \n");
-		gotoxy(Ox, 12);	printf("  -;-              -:;;;;;;:,            :;. \n");
-		gotoxy(Ox, 13);	printf("  .;~           .:;;~..  .,:;;~           ;: \n");
-		gotoxy(Ox, 14);	printf("  :;.          -;;.          -;;.         -;- \n");
-		gotoxy(Ox, 15);	printf(" .;-          -;~              :;.         :; \n");
-		gotoxy(Ox, 16);	printf(" ~;.         ,;~                ;;         -;. \n");
-		gotoxy(Ox, 17);	printf(" ::          ;:                 .;~        .;- \n");
-		gotoxy(Ox, 18);	printf(".;~         ,;-                  :;         :: \n");
-		gotoxy(Ox, 19);	printf(".;-         ~;                   -;.        :; \n");
-		gotoxy(Ox, 20);	printf(",;-         ~;                   .;.        :; \n");
-		gotoxy(Ox, 21);	printf(".;-         ~;                   -;.        :; \n");
-		gotoxy(Ox, 22);	printf(".;~         ,;-                  :;         ;: \n");
-		gotoxy(Ox, 23);	printf(" ::          ;:                 .;~        .;- \n");
-		gotoxy(Ox, 24);	printf(" ~;.         ,;~                ;;         -;. \n");
-		gotoxy(Ox, 25);	printf(" .;-          -;~             .:;.         :; \n");
-		gotoxy(Ox, 26);	printf("  ~;.          ,;:,          -;;.         -;, \n");
-		gotoxy(Ox, 27);	printf("  .;:           .~;;~,....-:;;-           ;: \n");
-		gotoxy(Ox, 28);	printf("   -;-             --:;;;;;;~             :;. \n");
-		gotoxy(Ox, 29);	printf("    ~;,                                 ~;, \n");
-		gotoxy(Ox, 30);	printf("     ~;-                               ~;, \n");
-		gotoxy(Ox, 31);	printf("      ~;~                            .:;, \n");
-		gotoxy(Ox, 32);	printf("       ,;;,                         ~;:. \n");
-		gotoxy(Ox, 33);	printf("        ~;:,                     -;;- \n");
-		gotoxy(Ox, 34);	printf("         .~;;~,               ,:;;- \n");
-		gotoxy(Ox, 35);	printf("           .-:;;:~-,.....,,-~:;;~, \n");
-		gotoxy(Ox, 36);	printf("               ,-~:;;;;;;;;;:~-.  \n");
+		gotoxy(Ox, 4);   printf("              ...;;;;;;... \n");
+		gotoxy(Ox, 5);   printf("           -;;;:~,.   ..-~;;;:, \n");
+		gotoxy(Ox, 6);   printf("         .:;;~.               ,:;;~ \n");
+		gotoxy(Ox, 7);   printf("       :;;.                     -;;- \n");
+		gotoxy(Ox, 8);   printf("     ,;;,                         -;;.\n");
+		gotoxy(Ox, 9);   printf("    ~;~                             ;;, \n");
+		gotoxy(Ox, 10);   printf("   :;-                               ~;- \n");
+		gotoxy(Ox, 11);   printf("   ~;,                                 ~;, \n");
+		gotoxy(Ox, 12);   printf("  -;-              -:;;;;;;:,            :;. \n");
+		gotoxy(Ox, 13);   printf("  .;~           .:;;~..  .,:;;~           ;: \n");
+		gotoxy(Ox, 14);   printf("  :;.          -;;.          -;;.         -;- \n");
+		gotoxy(Ox, 15);   printf(" .;-          -;~              :;.         :; \n");
+		gotoxy(Ox, 16);   printf(" ~;.         ,;~                ;;         -;. \n");
+		gotoxy(Ox, 17);   printf(" ::          ;:                 .;~        .;- \n");
+		gotoxy(Ox, 18);   printf(".;~         ,;-                  :;         :: \n");
+		gotoxy(Ox, 19);   printf(".;-         ~;                   -;.        :; \n");
+		gotoxy(Ox, 20);   printf(",;-         ~;                   .;.        :; \n");
+		gotoxy(Ox, 21);   printf(".;-         ~;                   -;.        :; \n");
+		gotoxy(Ox, 22);   printf(".;~         ,;-                  :;         ;: \n");
+		gotoxy(Ox, 23);   printf(" ::          ;:                 .;~        .;- \n");
+		gotoxy(Ox, 24);   printf(" ~;.         ,;~                ;;         -;. \n");
+		gotoxy(Ox, 25);   printf(" .;-          -;~             .:;.         :; \n");
+		gotoxy(Ox, 26);   printf("  ~;.          ,;:,          -;;.         -;, \n");
+		gotoxy(Ox, 27);   printf("  .;:           .~;;~,....-:;;-           ;: \n");
+		gotoxy(Ox, 28);   printf("   -;-             --:;;;;;;~             :;. \n");
+		gotoxy(Ox, 29);   printf("    ~;,                                 ~;, \n");
+		gotoxy(Ox, 30);   printf("     ~;-                               ~;, \n");
+		gotoxy(Ox, 31);   printf("      ~;~                            .:;, \n");
+		gotoxy(Ox, 32);   printf("       ,;;,                         ~;:. \n");
+		gotoxy(Ox, 33);   printf("        ~;:,                     -;;- \n");
+		gotoxy(Ox, 34);   printf("         .~;;~,               ,:;;- \n");
+		gotoxy(Ox, 35);   printf("           .-:;;:~-,.....,,-~:;;~, \n");
+		gotoxy(Ox, 36);   printf("               ,-~:;;;;;;;;;:~-.  \n");
 	}
 	else
 	{
 		system("color 0E");
-		gotoxy(Xx, 4);	printf("  :;~ .:;~                          ,;;, ,;;.\n");
-		gotoxy(Xx, 5);	printf(" .;~    -;:                        ~;~    .;~ \n");
-		gotoxy(Xx, 6);	printf(" .;-     .;;,                    .;;,     .;~\n");
-		gotoxy(Xx, 7);	printf(" :;,      ~;~                  ,;:.      :;.\n");
-		gotoxy(Xx, 8);	printf("  :;~      ,;;                ~;~      ,;;. \n");
-		gotoxy(Xx, 9);	printf("   -;:      .;;,            .;;,      ~;:\n");
-		gotoxy(Xx, 10);	printf("    .;;,      ~;~          ,;;.      :;-  \n");
-		gotoxy(Xx, 11);	printf("      :;~      ,;;.       ~;~      ,;;.\n");
-		gotoxy(Xx, 12);	printf("       -;:      .;;,    .;;,      ~;:\n");
-		gotoxy(Xx, 13);	printf("        .;;,      ~;~  -;;.      :;-\n");
-		gotoxy(Xx, 14);	printf("          :;~      ,;;:;~      ,;;.\n");
-		gotoxy(Xx, 15);	printf("           -;:      .;;,      ~;:\n");
-		gotoxy(Xx, 16);	printf("            .;;,            .:;-\n");
-		gotoxy(Xx, 17);	printf("              :;-          ,;;.\n");
-		gotoxy(Xx, 18);	printf("               -;:        ~;~\n");
-		gotoxy(Xx, 19);	printf("               -;:        ~;:\n");
-		gotoxy(Xx, 20);	printf("              ~;~          ,;:. \n");
-		gotoxy(Xx, 21);	printf("            .;;,            .:;-\n");
-		gotoxy(Xx, 22);	printf("           -;:.     .:;,      ~;~\n");
-		gotoxy(Xx, 23);	printf("          :;~      ,;;~;~      ,;:.\n");
-		gotoxy(Xx, 24);	printf("        .:;,      ~;~  -;:.     .:;- \n");
-		gotoxy(Xx, 25);	printf("       -;:.     .:;-    .;;,      ~;~ \n");
-		gotoxy(Xx, 26);	printf("      ~;~      ,;:.       ~;~      ,;:. \n");
-		gotoxy(Xx, 27);	printf("    .:;,      ~;~          -;:.     .:;- \n");
-		gotoxy(Xx, 28);	printf("   -;:.     .:;,            .:;,      ~;~ \n");
-		gotoxy(Xx, 29);	printf("  ~;~      ,;;.               ~;~      ,;:. \n");
-		gotoxy(Xx, 30);	printf(" :;,      ~;~                  -;:.     .:;. \n");
-		gotoxy(Xx, 31);	printf(".;-     .:;,                    .:;,     .;~\n");
-		gotoxy(Xx, 32);	printf(".;~    -;:.                       ~;~    .;~ \n");
-		gotoxy(Xx, 33);	printf(" ~;-.,~;~                          ,;:,.-:;.\n");
-		gotoxy(Xx, 34);	printf("  -:;;:,                            .~;;;~.\n");
+		gotoxy(Xx, 4);   printf("  :;~ .:;~                          ,;;, ,;;.\n");
+		gotoxy(Xx, 5);   printf(" .;~    -;:                        ~;~    .;~ \n");
+		gotoxy(Xx, 6);   printf(" .;-     .;;,                    .;;,     .;~\n");
+		gotoxy(Xx, 7);   printf(" :;,      ~;~                  ,;:.      :;.\n");
+		gotoxy(Xx, 8);   printf("  :;~      ,;;                ~;~      ,;;. \n");
+		gotoxy(Xx, 9);   printf("   -;:      .;;,            .;;,      ~;:\n");
+		gotoxy(Xx, 10);   printf("    .;;,      ~;~          ,;;.      :;-  \n");
+		gotoxy(Xx, 11);   printf("      :;~      ,;;.       ~;~      ,;;.\n");
+		gotoxy(Xx, 12);   printf("       -;:      .;;,    .;;,      ~;:\n");
+		gotoxy(Xx, 13);   printf("        .;;,      ~;~  -;;.      :;-\n");
+		gotoxy(Xx, 14);   printf("          :;~      ,;;:;~      ,;;.\n");
+		gotoxy(Xx, 15);   printf("           -;:      .;;,      ~;:\n");
+		gotoxy(Xx, 16);   printf("            .;;,            .:;-\n");
+		gotoxy(Xx, 17);   printf("              :;-          ,;;.\n");
+		gotoxy(Xx, 18);   printf("               -;:        ~;~\n");
+		gotoxy(Xx, 19);   printf("               -;:        ~;:\n");
+		gotoxy(Xx, 20);   printf("              ~;~          ,;:. \n");
+		gotoxy(Xx, 21);   printf("            .;;,            .:;-\n");
+		gotoxy(Xx, 22);   printf("           -;:.     .:;,      ~;~\n");
+		gotoxy(Xx, 23);   printf("          :;~      ,;;~;~      ,;:.\n");
+		gotoxy(Xx, 24);   printf("        .:;,      ~;~  -;:.     .:;- \n");
+		gotoxy(Xx, 25);   printf("       -;:.     .:;-    .;;,      ~;~ \n");
+		gotoxy(Xx, 26);   printf("      ~;~      ,;:.       ~;~      ,;:. \n");
+		gotoxy(Xx, 27);   printf("    .:;,      ~;~          -;:.     .:;- \n");
+		gotoxy(Xx, 28);   printf("   -;:.     .:;,            .:;,      ~;~ \n");
+		gotoxy(Xx, 29);   printf("  ~;~      ,;;.               ~;~      ,;:. \n");
+		gotoxy(Xx, 30);   printf(" :;,      ~;~                  -;:.     .:;. \n");
+		gotoxy(Xx, 31);   printf(".;-     .:;,                    .:;,     .;~\n");
+		gotoxy(Xx, 32);   printf(".;~    -;:.                       ~;~    .;~ \n");
+		gotoxy(Xx, 33);   printf(" ~;-.,~;~                          ,;:,.-:;.\n");
+		gotoxy(Xx, 34);   printf("  -:;;:,                            .~;;;~.\n");
 	}
 	cursorview(0);
 	Sleep(1000);
@@ -698,7 +700,7 @@ void start_motion()
 	system("cls");
 	for (i = 3; i > 0; i--)
 	{
-		gotoxy(53, 18);	 printf("%d", i);
+		gotoxy(53, 18);    printf("%d", i);
 		cursorview(0);
 		Sleep(1000);
 	}
@@ -707,11 +709,11 @@ void start_motion()
 void end_motion(int x)
 {
 	system("cls");
-	gotoxy(45, 15);		 printf("********끝********");
+	gotoxy(45, 15);       printf("********끝********");
 	cursorview(0);
 	Sleep(1000);
 	system("cls");
-	gotoxy(45, 15);		 printf("********%d개********", x);
+	gotoxy(45, 15);       printf("********%d개********", x);
 	cursorview(0);
 	Sleep(2000);
 }
@@ -728,7 +730,7 @@ void check_score()
 {
 	system("mode con cols=30 lines=20");
 	system("puase");
-	gotoxy(50, 10);	 printf("*******현재의 점수: %d점*******", score);
+	gotoxy(50, 10);    printf("*******현재의 점수: %d점*******", score);
 }
 
 void cursorview(char show)//커서숨기기
@@ -754,11 +756,11 @@ int tutorial_timing()
 	system("mode con cols=50 lines=25");
 	system("color 0F");
 
-	gotoxy(0, 3);		printf("\t< 타이밍 게임 >");
-	gotoxy(0, 7);		printf("\t말그대로 타이밍을 맞춰봅시다! 	");
-	gotoxy(0, 9);		printf("\t줄이 내려오는 타이밍에 맞춰서..		");
-	gotoxy(0, 11);		printf("\t\'아무 키\'나 눌러주세요!	");
-	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+	gotoxy(0, 3);      printf("\t< 타이밍 게임 >");
+	gotoxy(0, 7);      printf("\t말그대로 타이밍을 맞춰봅시다!    ");
+	gotoxy(0, 9);      printf("\t줄이 내려오는 타이밍에 맞춰서..      ");
+	gotoxy(0, 11);      printf("\t\'아무 키\'나 눌러주세요!   ");
+	gotoxy(0, 20);      printf("\t시작하려면 아무키나 누르세요...");
 
 	cursorview(0);
 
@@ -772,12 +774,12 @@ int tutorial_wasd()
 	system("mode con cols=50 lines=25");
 	system("color 0F");
 
-	gotoxy(0, 3);		printf("\t< WASD >");
-	gotoxy(0, 7);		printf("\tWASDWASDWASDWASDWASDWASDWASDWASD !!!!	");
-	gotoxy(0, 9);		printf("\t타자를 좋아하는 당신의 마음을 보여주세요!		");
-	gotoxy(0, 11);		printf("\t사각형 안에 있는 글자를 입력하세요!!");
-	gotoxy(0, 15);		printf("\t제한시간 : 10 초 ");
-	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+	gotoxy(0, 3);      printf("\t< WASD >");
+	gotoxy(0, 7);      printf("\tWASDWASDWASDWASDWASDWASDWASDWASD !!!!   ");
+	gotoxy(0, 9);      printf("\t타자를 좋아하는 당신의 마음을 보여주세요!      ");
+	gotoxy(0, 11);      printf("\t사각형 안에 있는 글자를 입력하세요!!");
+	gotoxy(0, 15);      printf("\t제한시간 : 10 초 ");
+	gotoxy(0, 20);      printf("\t시작하려면 아무키나 누르세요...");
 
 	cursorview(0);
 
@@ -792,13 +794,13 @@ int tutorial_taza()
 	system("mode con cols=50 lines=25");
 	system("color 0F");
 
-	gotoxy(0, 3);		printf("\t< Taza ( 타자 ) >");
-	gotoxy(0, 7);		printf("\t아무키나 최대한 많이,	");
-	gotoxy(0, 9);		printf("\t그리고 빨리 입력하세요 !!");
-	gotoxy(0, 11);		printf("\t당신의 스트레스를 풀 수 있는 기회!");
-	gotoxy(0, 14);		printf("\t최대 100점까지 획득 가능 !!");
-	gotoxy(0, 16);		printf("\t제한시간 : 8 초 ");
-	gotoxy(0, 21);		printf("\t시작하려면 아무키나 누르세요...");
+	gotoxy(0, 3);      printf("\t< Taza ( 타자 ) >");
+	gotoxy(0, 7);      printf("\t아무키나 최대한 많이,   ");
+	gotoxy(0, 9);      printf("\t그리고 빨리 입력하세요 !!");
+	gotoxy(0, 11);      printf("\t당신의 스트레스를 풀 수 있는 기회!");
+	gotoxy(0, 14);      printf("\t최대 100점까지 획득 가능 !!");
+	gotoxy(0, 16);      printf("\t제한시간 : 8 초 ");
+	gotoxy(0, 21);      printf("\t시작하려면 아무키나 누르세요...");
 
 	cursorview(0);
 
@@ -813,12 +815,12 @@ int tutorial_rsp()
 	system("mode con cols=50 lines=25");
 	system("color 0F");
 
-	gotoxy(0, 3);		printf("\t< 가위 바위 보 >");
-	gotoxy(0, 7);		printf("\t왼쪽이 이기면 \'A\'		");
-	gotoxy(0, 9);		printf("\t오른쪽이 이기면 \'D\'		");
-	gotoxy(0, 11);		printf("\t비기면 \'S\'를 눌러주세요!	");
-	gotoxy(0, 15);		printf("\t제한시간 : 2 초	");
-	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+	gotoxy(0, 3);      printf("\t< 가위 바위 보 >");
+	gotoxy(0, 7);      printf("\t왼쪽이 이기면 \'A\'      ");
+	gotoxy(0, 9);      printf("\t오른쪽이 이기면 \'D\'      ");
+	gotoxy(0, 11);      printf("\t비기면 \'S\'를 눌러주세요!   ");
+	gotoxy(0, 15);      printf("\t제한시간 : 2 초   ");
+	gotoxy(0, 20);      printf("\t시작하려면 아무키나 누르세요...");
 
 	if (_getch())
 		return START;
@@ -853,50 +855,51 @@ void set_gamesize()
 	system("mode con cols=110 lines=41");
 	system("color 0F");
 }
-int sock_ready() {
-	int flag;
-	printf("COM1 : 1\n");
-	printf("COM0 : 0\n을 입력하세요");
-	scanf("%d", &flag);
 
+int sock_main(int flag) {
 
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
-	
-	
-	hListen = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);                    //IPV4타입, 연결지향형 소켓, TCP 사용
-
-
-	SOCKADDR_IN tListenAddr;						//소켓 구성요소 담을 구조체 생성
-	memset(&tListenAddr, 0, sizeof(SOCKADDR_IN));	                        //구조체 0으로 초기화       
-	tListenAddr.sin_family = AF_INET;                                       //주소 정보
-	tListenAddr.sin_port = htons(PORT);					//포트 번호
-	if (flag == TRUE) //COM0 (SERVER)
+	int fin;
+	if (flag == FALSE) //COM0 (SERVER)
 	{
-
+		hListen = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+		SOCKADDR_IN tListenAddr;                  //소켓 구성요소 담을 구조체 생성
+		memset(&tListenAddr, 0, sizeof(SOCKADDR_IN));
+		tListenAddr.sin_family = AF_INET;                                       //주소 정보
+		tListenAddr.sin_port = htons(PORT);
 		tListenAddr.sin_addr.s_addr = htonl(INADDR_ANY);                        //ip주소 설정 - 현재 동작되는 컴퓨터의 ip 주소
-
 
 		bind(hListen, (SOCKADDR*)& tListenAddr, sizeof(tListenAddr));            //소캣의 주소정보 전달
 		listen(hListen, SOMAXCONN);                                              //접속 승인
 
 		SOCKADDR_IN tCom1Addr;                                                   //소켓 정보 담을 구조체 생성
-		memset(&tCom1Addr, 0, sizeof(SOCKADDR_IN));								 //구조체 0으로 초기화
+		memset(&tCom1Addr, 0, sizeof(SOCKADDR_IN));                         //구조체 0으로 초기화
 		int iClntSize = sizeof(tCom1Addr);
 		hSock = accept(hListen, (SOCKADDR*)& tCom1Addr, &iClntSize);    //접속 요청 수락
-
+		fin = chatting_COM0(hSock);
 	}
 	else           //COM1 (CLIENT)
 	{
-		tListenAddr.sin_addr.s_addr = inet_addr(COM0_IP);
 
-		connect(hListen, (SOCKADDR*)& tListenAddr, sizeof(tListenAddr));       //지정된 소켓에 연결(=bind)
+		hSock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);        //IPV4타입, 연결지향형 소켓, TCP 사용 
+
+		SOCKADDR_IN tAddr;                                     //구조체 생성
+		tAddr.sin_family = AF_INET;
+		tAddr.sin_port = htons(PORT);
+		tAddr.sin_addr.s_addr = inet_addr(COM0_IP);
+
+		connect(hSock, (SOCKADDR*)& tAddr, sizeof(tAddr));       //지정된 소켓에 연결(=bind)
+		fin = chatting_COM1(hSock);
 	}
-	return flag;
+	closesocket(hSock);
+	closesocket(hListen);
+	return fin;
 }
 
 int chatting_COM0(SOCKET hCOM1)
 {
+	int fin;
 	int nRcv, strLen;
 	char message[PACKET_SIZE];
 	char indi[2] = { 'q' };
@@ -921,17 +924,27 @@ int chatting_COM0(SOCKET hCOM1)
 		if (a == FALSE)
 		{
 			printf("Close...\n");
+			send(hCOM1, message, strlen(message), 0);
 			break;
 		}
 
 		strLen = strlen(message);
 		send(hCOM1, message, strLen, 0);                            //message 보냄
 	}
+	char r_message[PACKET_SIZE];
+	recv(hCOM1, r_message, PACKET_SIZE, 0);
+	printf("COM1 SCORE : %d", r_message[0]);
+	fin = (int)r_message[0];
+	char s_message[3] = { 0 , };
+	s_message[0] = score;
+	send(hCOM1, s_message, strlen(s_message), 0);
+	fin = (score > fin) ? TRUE : FALSE;
+	return fin;
 }
 
-void chatting_COM1(SOCKET hCOM0) 
+int chatting_COM1(SOCKET hCOM0)
 {                //채팅 부분
-	int nRcv;
+	int nRcv, fin;
 	char message[PACKET_SIZE];
 	char indi[2] = { 'q' };                   //q를 누르면 채팅 끔
 	while (1)
@@ -962,9 +975,21 @@ void chatting_COM1(SOCKET hCOM0)
 
 		printf("Receive Message : %s", message);
 	}
+	char s_message[3] = { 0, };
+	s_message[0] = score;
+	send(hCOM0, s_message, strlen(s_message), 0);
+
+	char r_message[PACKET_SIZE] = { 0, };
+	recv(hCOM0, r_message, PACKET_SIZE, 0);
+
+	printf("COM0 score : %d", r_message[0]);
+	fin = (int)r_message[0];
+
+	fin = (score > fin) ? TRUE : FALSE;
+	return fin;
 }
 
-void sock_clean(SOCKET hSock, SOCKET hListen) 
+void sock_clean(SOCKET hSock, SOCKET hListen)
 {
 	closesocket(hSock);
 	closesocket(hListen);
@@ -972,24 +997,40 @@ void sock_clean(SOCKET hSock, SOCKET hListen)
 	WSACleanup();
 }
 
-void sock_score_COM0(SOCKET hCOM1, int flag)
+int sock_score_COM(SOCKET hCOM, int flag)
 {
 	int nRcv;
 	char message[PACKET_SIZE];
+	int fin;
+	if (flag == 0) {
+		recv(hCOM, message, PACKET_SIZE, 0);
+		printf("COM1 SCORE : %d", message[0]);
+		fin = (int)message[0];
+		char s_message[3] = { 0 , };
+		s_message[0] = score;
+		send(hCOM, s_message, strlen(s_message), 0);
+	}
+	else if (flag == 1) {
+		char s_message[3] = { 0, };
+		s_message[0] = score;
+		send(hCOM, s_message, strlen(s_message), 0);
 
-	send(hCOM1, (char*)score, strlen((char*)score), 0);
-	nRcv = recv(hCOM1, (char*)score, sizeof((char*)score) - 1, 0);
-	message[nRcv] = '\0';
-	printf("COM1 SCORE : %s", message);
+		char message[PACKET_SIZE] = { 0, };
+		recv(hCOM, message, PACKET_SIZE, 0);
+
+		printf("COM0 score : %d", message[0]);
+		fin = (int)message[0];
+	}
+	fin = (score > fin) ? TRUE : FALSE;           //TRUE : 이김, FALSE : 짐
+
+	return fin;
 }
 
-void sock_score_COM1(SOCKET hCOM0, int flag)
-{
-	int nRcv;
-	char message[PACKET_SIZE];
-
-	nRcv = recv(hCOM0, (char*)score, sizeof((char*)score) - 1, 0);
-	message[nRcv] = '\0';
-	printf("COM1 SCORE : %s", message);
-	send(hCOM0, (char*)score, strlen((char*)score), 0);
+int flag_com() {
+	system("cls");
+	int flag;
+	printf("COM1 : 1\n");                   //CLIENT
+	printf("COM0 : 0\n을 입력하세요\n");       //SERVER
+	scanf("%d", &flag);
+	return flag;
 }
