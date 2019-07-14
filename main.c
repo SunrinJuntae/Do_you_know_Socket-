@@ -5,6 +5,8 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <Winsock2.h>
+
 
 #define TIMEFINGER 31 // Use in timing
 #define A 97
@@ -14,7 +16,11 @@
 #define START 2
 #define Xx 32
 #define Ox 32 
+#define PORT 4578
+#define PACKET_SIZE 1024
+#define COM0_IP "192.168.35.99"         //COM0 IP주소 입력
 
+SOCKET hSock, hListen;
 int score = 0;
 char wasd_made[30] = { 0, };
 
@@ -55,16 +61,31 @@ void gotoxy(int x, int y);
 void cursorview(char show);
 void set_gamesize();
 
+int sock_ready();
+int chatting_COM0(SOCKET hCOM1);
+void chatting_COM1(SOCKET hCOM0);
+void sock_clean(SOCKET hSock, SOCKET hListen);
+void sock_score_COM0(SOCKET hCOM0, int flag);
+void sock_score_COM1(SOCKET hCOM0, int flag);
+
+
 int main()
 {
 
 	int start = menu(); // if Enter = start
 	int game_start; // start값 랜덤으로 나오게 바꿔서 게임 랜덤 실행 구현해보장
-
+	int flag;
+	sock_ready();
+	
 	if (start == 1)
 	{
 		system("cls");
-
+		if (flag == 0) {
+			chatting_COM0(hSock);
+		}
+		else if (flag == 1) {
+			chatting_COM1(hSock);
+		}
 		game_start = tutorial_rsp();
 		if (game_start == START)
 		{
@@ -92,9 +113,11 @@ int main()
 			fflush(stdin);
 			wasd();
 		}
-
+		(flag == 0) ? sock_score_COM0(hSock, flag) : sock_score_COM1(hSock, flag);
 		score_save();
 	}
+
+	sock_clean(hSock, hListen);
 	system("pause");
 	return 0;
 }
@@ -463,7 +486,7 @@ void taza()
 			_getch();
 			score_taza++;
 			real_score++;
-			
+
 			if (score_taza >= 10)
 			{
 				line_score -= 2;
@@ -829,4 +852,144 @@ void set_gamesize()
 {
 	system("mode con cols=110 lines=41");
 	system("color 0F");
+}
+int sock_ready() {
+	int flag;
+	printf("COM1 : 1\n");
+	printf("COM0 : 0\n을 입력하세요");
+	scanf("%d", &flag);
+
+
+	WSADATA wsaData;
+	WSAStartup(MAKEWORD(2, 2), &wsaData);
+	
+	
+	hListen = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);                    //IPV4타입, 연결지향형 소켓, TCP 사용
+
+
+	SOCKADDR_IN tListenAddr;						//소켓 구성요소 담을 구조체 생성
+	memset(&tListenAddr, 0, sizeof(SOCKADDR_IN));	                        //구조체 0으로 초기화       
+	tListenAddr.sin_family = AF_INET;                                       //주소 정보
+	tListenAddr.sin_port = htons(PORT);					//포트 번호
+	if (flag == TRUE) //COM0 (SERVER)
+	{
+
+		tListenAddr.sin_addr.s_addr = htonl(INADDR_ANY);                        //ip주소 설정 - 현재 동작되는 컴퓨터의 ip 주소
+
+
+		bind(hListen, (SOCKADDR*)& tListenAddr, sizeof(tListenAddr));            //소캣의 주소정보 전달
+		listen(hListen, SOMAXCONN);                                              //접속 승인
+
+		SOCKADDR_IN tCom1Addr;                                                   //소켓 정보 담을 구조체 생성
+		memset(&tCom1Addr, 0, sizeof(SOCKADDR_IN));								 //구조체 0으로 초기화
+		int iClntSize = sizeof(tCom1Addr);
+		hSock = accept(hListen, (SOCKADDR*)& tCom1Addr, &iClntSize);    //접속 요청 수락
+
+	}
+	else           //COM1 (CLIENT)
+	{
+		tListenAddr.sin_addr.s_addr = inet_addr(COM0_IP);
+
+		connect(hListen, (SOCKADDR*)& tListenAddr, sizeof(tListenAddr));       //지정된 소켓에 연결(=bind)
+	}
+	return flag;
+}
+
+int chatting_COM0(SOCKET hCOM1)
+{
+	int nRcv, strLen;
+	char message[PACKET_SIZE];
+	char indi[2] = { 'q' };
+	bool a;
+	while (1)
+	{
+		printf("Message Recives .. \n");
+		nRcv = recv(hCOM1, message, sizeof(message) - 1, 0);          //message 받음
+
+		message[nRcv] = '\0';
+		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //message가 q인지 판단하기 위함
+		if (a == FALSE)
+		{
+			printf("Close\n");
+			break;
+		}
+
+		printf("Receive Message : %s", message);
+		printf("\nSend Message : ");
+		fgets(message, 30, stdin);                                     //message 입력받음
+		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //q인지 판단
+		if (a == FALSE)
+		{
+			printf("Close...\n");
+			break;
+		}
+
+		strLen = strlen(message);
+		send(hCOM1, message, strLen, 0);                            //message 보냄
+	}
+}
+
+void chatting_COM1(SOCKET hCOM0) 
+{                //채팅 부분
+	int nRcv;
+	char message[PACKET_SIZE];
+	char indi[2] = { 'q' };                   //q를 누르면 채팅 끔
+	while (1)
+	{
+		printf("Message : ");
+		fgets(message, 30, stdin);
+		BOOL a = (message[0] == indi[0]) ? FALSE : TRUE;       //a 로 채팅을 끌지 말지 판단
+		printf("%s", message);
+		printf("%d", a);
+		if (a == FALSE)
+		{
+			send(hCOM0, message, strlen(message), 0);      //q를 보내 server도 채팅을 끄게 함
+			printf("Close..\n");
+			break;
+		}
+		send(hCOM0, message, strlen(message), 0);       //message를 보냄
+		printf("Message Receives...\n");
+
+		nRcv = recv(hCOM0, message, sizeof(message) - 1, 0);        //message를 받음
+
+		message[nRcv] = '\0';                     //메세지 뒤에 널문자 붙여줌
+		a = (message[0] == indi[0]) ? FALSE : TRUE;          //q 판단
+		if (a == FALSE)
+		{
+			printf("Close Server Connection...\n");
+			break;
+		}
+
+		printf("Receive Message : %s", message);
+	}
+}
+
+void sock_clean(SOCKET hSock, SOCKET hListen) 
+{
+	closesocket(hSock);
+	closesocket(hListen);
+
+	WSACleanup();
+}
+
+void sock_score_COM0(SOCKET hCOM1, int flag)
+{
+	int nRcv;
+	char message[PACKET_SIZE];
+
+	send(hCOM1, (char*)score, strlen((char*)score), 0);
+	nRcv = recv(hCOM1, (char*)score, sizeof((char*)score) - 1, 0);
+	message[nRcv] = '\0';
+	printf("COM1 SCORE : %s", message);
+}
+
+void sock_score_COM1(SOCKET hCOM0, int flag)
+{
+	int nRcv;
+	char message[PACKET_SIZE];
+
+	nRcv = recv(hCOM0, (char*)score, sizeof((char*)score) - 1, 0);
+	message[nRcv] = '\0';
+	printf("COM1 SCORE : %s", message);
+	send(hCOM0, (char*)score, strlen((char*)score), 0);
 }
