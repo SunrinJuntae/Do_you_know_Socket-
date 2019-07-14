@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <time.h>
+#include <Windows.h>
+#include <stdlib.h>
+
+int main()
+{
+	srand(time(NULL));
+
+	int updown; // 컴퓨터가 정하는 수
+	int count = 0; // 몇 번 안에 맞출 건지
+	int i, j; // 반복문
+	int input; // 사용자가 입력한 숫자
+	int again = 0; // 게임 반복
+
+
+	while (1)
+	{
+		updown = rand() % 10000 + 1; // 랜덤 정하기
+
+		printf("몇 번 안에 맞출지 입력하세요. (1부터 100까지 가능) ");
+		scanf("%d", &count);
+
+		while (1)
+		{
+			if (count < 1 || count > 100) // 시도 횟수가 범위를 벗어났을 때
+			{
+				printf("범위에 맞지 않습니다. 다시 입력해주세요. ");
+				scanf("%d", &count); // 다시 입력
+			}
+			else
+				break;
+		}
+
+		printf("수를 입력하세요. 범위는 1부터 10000입니다. \n");
+		
+
+		for (i = 1; i <= count; i++) // 몇 번 맞출지 반복
+		{
+			printf("============================== \n");
+			printf("%d번째 시도 : ", i);
+			scanf("%d", &input);
+
+			while (1)
+			{
+				if (input < 0 || input > 10000) // 숫자 범위를 벗어났을 때
+				{
+					printf("범위에 맞지 않습니다. 다시 입력해주세요. ");
+					scanf("%d", &input); // 다시 입력
+				}
+				else
+					break;
+			}
+
+			if (updown > input) // 결과 출력
+				printf("%d보다 큽니다. \n", input); 
+			else if (updown < input)
+				printf("%d보다 작습니다. \n", input);
+			else if (updown == input)
+			{
+				printf("정답입니다. %d번 만에 성공하셨습니다. ", i);
+				break;
+			}
+      
+			printf("============================== \n");
+			printf("\n");
+		}
+    
+		if (updown != input) // 설정 범위 안에서 못 맞췄을 경우
+			printf("게임 실패! 정답은 %d였습니다.", updown);
+
+		printf("게임을 다시 하시겠습니까? (맞으면 1, 아니면 0을 입력하세요.) "); // 게임 다시 실행
+		scanf("%d", &again);
+
+		if (again == 1)
+		{
+			printf("게임을 다시 시작합니다. \n");
+			system("cls");
+		}
+			
+		else if (again == 0)
+		{
+			printf("게임이 종료되었습니다. \n");
+			break;
+		}
+			
+	}
+
+}
+
