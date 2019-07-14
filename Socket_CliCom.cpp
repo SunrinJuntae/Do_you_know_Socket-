@@ -2,64 +2,64 @@
 #include <WinSock2.h>
 #include <string.h>
 #include <stdbool.h>
+#include <Ws2tcpip.h>			//inet_pton í¬í•¨ í—¤ë”
 #pragma comment(lib, "ws2_32")
 
 #define PORT 4578
 #define PACKET_SIZE 1024
 #define SERVER_IP "192.168.35.99"
-
-
-void socket(SOCKET hClient);
+void chatting(SOCKET hClient);
 
 int main() {
-	WSADATA wsaData;                                      
+	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-	
+
 	SOCKET hSocket;
-	hSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);        //IPV4Å¸ÀÔ, ¿¬°áÁöÇâÇü ¼ÒÄÏ, TCP »ç¿ë 
+	hSocket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);        //IPV4íƒ€ì…, ì—°ê²°ì§€í–¥í˜• ì†Œì¼“, TCP ì‚¬ìš© 
 
-	SOCKADDR_IN tAddr = {};                                     //±¸Á¶Ã¼ »ı¼º
+	SOCKADDR_IN tAddr;                                         //êµ¬ì¡°ì²´ ìƒì„±
+	memset(&tAddr, 0, sizeof(SOCKADDR_IN));			   //êµ¬ì¡°ì²´ 0ìœ¼ë¡œ ì´ˆê¸°í™”
 	tAddr.sin_family = AF_INET;
-	tAddr.sin_port = htons(PORT);
-	tAddr.sin_addr.s_addr = inet_addr(SERVER_IP);               //¼­¹ö ipÁÖ¼Ò
+	tAddr.sin_port = htons(PORT);               
+	inet_pton(AF_INET, &SERVER_IP, &(tAddr.sin_addr.s_addr));	//ì„œë²„ ipì£¼ì†Œ
+	
+	connect(hSocket, (SOCKADDR*)& tAddr, sizeof(tAddr));       //ì§€ì •ëœ ì†Œì¼“ì— ì—°ê²°(=bind)
 
-	connect(hSocket, (SOCKADDR*)& tAddr, sizeof(tAddr));       //ÁöÁ¤µÈ ¼ÒÄÏ¿¡ ¿¬°á(=bind)
+	chatting(hSocket);                                           //ì±„íŒ… ì‹œì‘
 
-	socket(hSocket);                                           //Ã¤ÆÃ ½ÃÀÛ
-
-	closesocket(hSocket);                                     //¼ÒÄÏ ´İÀ½
+	closesocket(hSocket);                                     //ì†Œì¼“ ë‹«ìŒ
 
 
-	WSACleanup();                                              //Á¤¸®
+	WSACleanup();                                              //ì •ë¦¬
 	return 0;
 }
 
 
-void socket(SOCKET hSocket) {                //Ã¤ÆÃ ºÎºĞ
+void chatting(SOCKET hSocket) {                //ì±„íŒ… ë¶€ë¶„
 	int nRcv;
 	char message[PACKET_SIZE];
-	char indi[2] = { 'q' };                   //q¸¦ ´©¸£¸é Ã¤ÆÃ ²û
+	char indi[2] = { 'q' };                   //që¥¼ ëˆ„ë¥´ë©´ ì±„íŒ… ë”
 	while (1)
 	{
 		printf("Message : ");
 		fgets(message, 30, stdin);
-		BOOL a = (message[0] == indi[0]) ? FALSE : TRUE;       //a ·Î Ã¤ÆÃÀ» ²øÁö ¸»Áö ÆÇ´Ü
+		BOOL a = (message[0] == indi[0]) ? FALSE : TRUE;       //a ë¡œ ì±„íŒ…ì„ ëŒì§€ ë§ì§€ íŒë‹¨
 		printf("%s", message);
 		printf("%d", a);
 		if (a == FALSE)
 		{
-			send(hSocket, message, strlen(message), 0);      //q¸¦ º¸³» serverµµ Ã¤ÆÃÀ» ²ô°Ô ÇÔ
+			send(hSocket, message, strlen(message), 0);      //që¥¼ ë³´ë‚´ serverë„ ì±„íŒ…ì„ ë„ê²Œ í•¨
 			printf("Close..\n");
 			break;
 		}
-		send(hSocket, message, strlen(message), 0);       //message¸¦ º¸³¿
+		send(hSocket, message, strlen(message), 0);       //messageë¥¼ ë³´ëƒ„
 		printf("Message Receives...\n");
 
-		nRcv = recv(hSocket, message, sizeof(message) - 1, 0);        //message¸¦ ¹ŞÀ½
-		 
-		message[nRcv] = '\0';                     //¸Ş¼¼Áö µÚ¿¡ ³Î¹®ÀÚ ºÙ¿©ÁÜ
-		a = (message[0] == indi[0]) ? FALSE : TRUE;          //q ÆÇ´Ü
+		nRcv = recv(hSocket, message, sizeof(message) - 1, 0);        //messageë¥¼ ë°›ìŒ
+
+		message[nRcv] = '\0';                     //ë©”ì„¸ì§€ ë’¤ì— ë„ë¬¸ì ë¶™ì—¬ì¤Œ
+		a = (message[0] == indi[0]) ? FALSE : TRUE;          //q íŒë‹¨
 		if (a == FALSE)
 		{
 			printf("Close Server Connection...\n");
