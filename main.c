@@ -5,13 +5,12 @@
 #include <Winsock2.h>
 #include <stdio.h>
 #include <conio.h>
-#include <stdlib.h>
-#include <time.h>
 #include <stdbool.h>
 #include <windows.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <process.h>
 
 #define TIMEFINGER 31 // Use in timing
 
@@ -87,6 +86,7 @@ void set_gamesize();
 int sock_main(int flag);
 int chatting_COM0(SOCKET hCOM1);
 int chatting_COM1(SOCKET hCOM0);
+void chatting_recv(SOCKET hCOM);
 void sock_clean(SOCKET hSock, SOCKET hListen);
 int flag_com();
 
@@ -137,7 +137,7 @@ int main()
 			}
 			if (game_start[i] == MY)
 			{
-				tutorial_updown();
+				tutorial_memory();
 				fflush(stdin);
 				memory();
 			}
@@ -785,7 +785,7 @@ void memory()
 		for (i = 0; i < j; i++)
 		{
 			gotoxy(50 + i, 13);
-			user[i] = getche();
+			user[i] = _getche();
 		}
 
 		if (i > j)
@@ -1147,23 +1147,13 @@ int chatting_COM0(SOCKET hCOM1)
 	bool a;
 	while (1)
 	{
-		nRcv = recv(hCOM1, message, sizeof(message) - 1, 0);          //message 받음
-
-		message[nRcv] = '\0';
-		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //message가 q인지 판단하기 위함
-		if (a == FALSE)
-		{
-			printf("Close\n");
-			break;
-		}
-
-		printf("COM1 : %s", message);
+		_beginthread(chatting_recv, 0, hCOM1);
 		printf("\nYOU : ");
 		fgets(message, 30, stdin);                                     //message 입력받음
 		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //q인지 판단
 		if (a == FALSE)
 		{
-			printf("Close...\n");
+			printf("\nClose...\n");
 			send(hCOM1, message, strlen(message), 0);
 			break;
 		}
@@ -1202,22 +1192,12 @@ int chatting_COM1(SOCKET hCOM0)
 		if (a == FALSE)
 		{
 			send(hCOM0, message, strlen(message), 0);      //q를 보내 server도 채팅을 끄게 함
-			printf("Close..\n");
+			printf("\nClose..\n");
 			break;
 		}
 		send(hCOM0, message, strlen(message), 0);       //message를 보냄
 
-		nRcv = recv(hCOM0, message, sizeof(message) - 1, 0);        //message를 받음
-
-		message[nRcv] = '\0';                     //메세지 뒤에 널문자 붙여줌
-		a = (message[0] == indi[0]) ? FALSE : TRUE;          //q 판단
-		if (a == FALSE)
-		{
-			printf("Close Chatting\n");
-			break;
-		}
-
-		printf("COM0 : %s", message);
+		_beginthread(chatting_recv, 0, hCOM0);
 	}
 	char s_message[3] = { 0, };
 	s_message[0] = score;
@@ -1236,6 +1216,31 @@ int chatting_COM1(SOCKET hCOM0)
 	else
 		fin = FALSE;           //TRUE : 이김, FALSE : 짐
 	return fin;
+}
+
+void chatting_recv(SOCKET hCOM)
+{
+	int nRcv;
+	char recv_message[PACKET_SIZE];
+	char indi[2] = { 'q' };
+
+	while (1)
+	{
+		nRcv = recv(hCOM, recv_message, sizeof(recv_message) - 1, 0);        //message를 받음
+
+		recv_message[nRcv] = '\0';                     //메세지 뒤에 널문자 붙여줌
+		BOOL a = (recv_message[0] == indi[0]) ? FALSE : TRUE;          //q 판단
+		if (a == FALSE)
+		{
+			printf("\nClose Server Connection...\n");
+			break;
+		}
+
+		printf("\nOPPOSITE : %s", recv_message);
+
+	}
+
+	return;
 }
 
 void sock_clean(SOCKET hSock, SOCKET hListen)
