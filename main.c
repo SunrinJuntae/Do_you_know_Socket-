@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #define TIMEFINGER 31 // Use in timing
 
@@ -19,11 +20,13 @@
 #define D 100
 #define W 119
 
-#define GAME_NUMBER 4
+#define GAME_NUMBER 6
 #define RSP 1
 #define TIMING 2
 #define TAZA 3
 #define WASD 4
+#define UD 5
+#define MY 6
 
 #define Xx 32
 #define Ox 32 
@@ -40,6 +43,8 @@ void tutorial_rsp(); // Game Tutorial
 void tutorial_timing();
 void tutorial_wasd();
 void tutorial_taza();
+void tutorial_updown();
+void tutorial_memory();
 
 int wasd(); // Game - wasd
 void wasd_map();
@@ -58,6 +63,10 @@ void timing_cleanline();
 
 void taza(); // Game - taza
 void taza_map();
+
+void updown(); // Game - updown
+
+void memory(); // Game - memory
 
 void ox(int x); // timing & rsp
 
@@ -85,7 +94,7 @@ int main()
 {
 
 	int start = menu(); // if Enter = start
-	int i, game_start[GAME_NUMBER] = { RSP, TIMING, TAZA, WASD }; //게임 순서 정할 때 
+	int i, game_start[GAME_NUMBER] = { RSP, TIMING, TAZA, WASD, UD, MY }; //게임 순서 정할 때 
 	int flag = 0;
 	flag = flag_com();
 
@@ -96,31 +105,41 @@ int main()
 		system("cls");
 		for (i = 0; i < GAME_NUMBER; i++) {
 
-			/*if (game_start[i] == RSP) {
+			if (game_start[i] == RSP) {
 				tutorial_rsp();
 				fflush(stdin);
 				rsp();
 			}
-
 			else if (game_start[i] == TIMING)
 			{
 				tutorial_timing();
 				fflush(stdin);
 				timing();
 			}
-
 			else if (game_start[i] == TAZA)
 			{
 				tutorial_taza();
 				fflush(stdin);
 				taza();
-			}*/
+			}
 
 			if (game_start[i] == WASD)
 			{
 				tutorial_wasd();
 				fflush(stdin);
 				wasd();
+			}
+			if (game_start[i] == UD)
+			{
+				tutorial_updown();
+				fflush(stdin);
+				updown();
+			}
+			if (game_start[i] == MY)
+			{
+				tutorial_updown();
+				fflush(stdin);
+				memory();
 			}
 		}
 
@@ -152,24 +171,24 @@ int menu()
 		gotoxy(0, 6);   textcolor(4);   printf("################################################"); textcolor(7);
 
 		gotoxy(6, 9);   textcolor(2);   printf("====================================");   textcolor(7);
-		gotoxy(6, 10);   printf(":                              :");
-		gotoxy(6, 11);   printf(":  < 게임 설명 >                    :");
-		gotoxy(6, 12);   printf(":                               :");
-		gotoxy(6, 13);   printf(":   ◈ 여러 미니게임을 클리어 하자!  :");
-		gotoxy(6, 14);   printf(":                              :");
-		gotoxy(6, 15);   printf(":   ⊙ 채팅을 통한 더 큰 재미!    :");
-		gotoxy(6, 16);   printf(":                             :");
-		gotoxy(6, 17);   printf(":                             :");
-		gotoxy(6, 18);   printf(":                             :");
-		gotoxy(6, 19);   printf(":    < 게임 방법 >                   :");
-		gotoxy(6, 20);   printf(":                              :");
-		gotoxy(6, 21);   printf(":   ♤ 매 게임마다 설명 등장!    :");
+		gotoxy(6, 10);   printf(":                                  :");
+		gotoxy(6, 11);   printf(":  < 게임 설명 >                   :");
+		gotoxy(6, 12);   printf(":                                  :");
+		gotoxy(6, 13);   printf(":  ◈ 여러 미니게임을 클리어 하자! :");
+		gotoxy(6, 14);   printf(":                                  :");
+		gotoxy(6, 15);   printf(":  ⊙ 채팅을 통한 더 큰 재미!      :");
+		gotoxy(6, 16);   printf(":                                  :");
+		gotoxy(6, 17);   printf(":                                  :");
+		gotoxy(6, 18);   printf(":                                  :");
+		gotoxy(6, 19);   printf(":    < 게임 방법 >                 :");
+		gotoxy(6, 20);   printf(":                                  :");
+		gotoxy(6, 21);   printf(":  ♤ 매 게임마다 설명 등장!       :");
 		gotoxy(6, 22);   printf(":                                  :");
-		gotoxy(6, 23);   printf(":   ◑ 설명을 잘 읽어보자!        :");
-		gotoxy(6, 24);   printf(":                              :");
-		gotoxy(6, 25);   printf(":   ※ 난이도는 점점 어려워진다!     :");
-		gotoxy(6, 26);   printf(":                              :");
-		gotoxy(6, 27);   printf(":                              :");
+		gotoxy(6, 23);   printf(":  ◑ 설명을 잘 읽어보자!          :");
+		gotoxy(6, 24);   printf(":                                  :");
+		gotoxy(6, 25);   printf(":  ※ 난이도는 점점 어려워진다!    :");
+		gotoxy(6, 26);   printf(":                                  :");
+		gotoxy(6, 27);   printf(":                                  :");
 		gotoxy(6, 28);   textcolor(2);   printf("===================================="); textcolor(7);
 
 		gotoxy(9, 31);   textcolor(9);   printf("------------------------------"); textcolor(7);
@@ -632,6 +651,175 @@ void wasd_make()
 	}
 }
 
+void updown()
+{
+
+	int updown; // 컴퓨터가 정하는 수
+	int count = 0; // 몇 번 안에 맞출 건지
+	int i, j; // 반복문
+	int input; // 사용자가 입력한 숫자
+	int again = 0; // 게임 반복
+	int base_score = 5;// 기본 점수
+
+
+	updown = rand() % 10000 + 1; // 랜덤 정하기
+
+	system("cls");
+	set_gamesize();
+	start_motion();
+	system("cls");
+
+
+	gotoxy(51, 4); printf("시도 횟수 입력\n");
+	gotoxy(51, 5); printf("(1부터 100까지) \n");
+
+	gotoxy(57, 8); scanf("%d", &count);
+
+	while (1)
+	{
+		if (count < 1 || count > 100)
+		{
+			gotoxy(52, 8); printf("                  \n");
+			gotoxy(57, 8); printf("X");
+			Sleep(500);
+			gotoxy(52, 8); printf("                  \n");
+			gotoxy(57, 8); scanf("%d", &count);
+		}
+		else
+			break;
+	}
+
+	Sleep(500);
+	system("cls");
+
+	wasd_map();
+
+	for (i = 1; i <= count; i++)
+	{
+		gotoxy(53, 9); printf("%d번째 시도", i);
+		gotoxy(56, 13); scanf("%d", &input);
+
+
+		while (1)
+		{
+			if (input < 0 || input > 10000)
+			{
+				gotoxy(57, 13); printf("X");
+				Sleep(100);
+				gotoxy(53, 13); printf("           \n");
+				gotoxy(55, 13); scanf("%d", &input);
+			}
+			else
+				break;
+		}
+
+		if (updown > input)
+		{
+			gotoxy(72, 13 + i); printf("%d ↑. \n", input);
+		}
+		else if (updown < input)
+		{
+			gotoxy(72, 13 + i); printf("%d ↓ \n", input);
+
+		}
+		else if (updown == input)
+		{
+			gotoxy(48, 17);
+			printf("%d번 만에 성공!", i);
+			score = base_score + (10 - i / input) * 5; // 기본 점수 + 가산점
+			break;
+		}
+		gotoxy(53, 13); printf("             \n");
+
+		printf("\n");
+	}
+	if (updown != input)
+	{
+		gotoxy(49, 17);
+		printf("실패! 정답은 %d!", updown);
+	}
+	Sleep(5000);
+}
+
+void memory()
+{
+
+	int rd[16]; // 랜덤으로 배열 넣기
+	int i = 0, j = 6, k = 3; // i는 기본 반복문 j는 레벨 6부터
+	int user[16] = { 0, }; // 사용자가 넣는 배열
+	int count = 0; // 틀린 횟수
+	int correct = 0; // 맞은 횟수
+	int sec = 3;
+
+	time_t start, end;
+	int times;
+	time(&start);
+
+	srand(time(NULL));
+
+	system("cls");
+	set_gamesize();
+	start_motion();
+
+
+
+	for (j = 6; j < 15; j++) // level1부터 level10까지
+	{
+		Sleep(1000);
+		system("cls");
+		wasd_map();
+
+
+		for (i = 0; i < j; i++)
+		{
+			rd[i] = rand() % 9; // 랜덤으로 인덱스에 하나하나 받기
+			gotoxy(i + 50, 13);
+			printf("%d", rd[i]);
+
+		}
+		Sleep(5000);
+		gotoxy(50, 13);
+		printf("           \n");
+		fflush(stdin);
+		int sec = 0;
+		for (i = 0; i < j; i++)
+		{
+			gotoxy(50 + i, 13);
+			user[i] = getche();
+		}
+
+		if (i > j)
+		{
+			ox(0);
+		}
+
+		printf("\n");
+
+		for (i = 0; i < j; i++)
+		{
+			if (rd[i] != (user[i] - 48)) // 원소 하나하나 맞는지 판별
+			{
+				count++;
+				ox(0);
+				break;
+			}
+			else if (rd[i] == (user[i] - 48))
+			{
+				correct++;
+			}
+		}
+		if (correct == j)
+		{
+			ox(1);
+		}
+
+		Sleep(100);
+
+	}
+	score = 10 - count;
+	end_motion(score);
+}
+
 void ox(int x)
 {
 	system("cls");
@@ -843,6 +1031,39 @@ void tutorial_rsp()
 	if (_getch())
 		return;
 }
+
+void tutorial_updown()
+{
+	system("mode con cols=50 lines=25");
+	system("color 0f");
+
+	gotoxy(0, 3);		printf("\t< 업 다운 >");
+	gotoxy(0, 7);		printf("\t 범위는 1부터 10000!");
+	gotoxy(0, 9);		printf("\t 시도 횟수는 1부터 100!");
+	gotoxy(0, 11);		printf("\t 시도 횟수를 넘으면 패배!");
+	gotoxy(0, 15);		printf("\t 시도 횟수 안에 맞추면 가산점!");
+	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+
+	if (_getch())
+		return;
+}
+
+void tutorial_memory()
+{
+	system("mode con cols=50 lines=25");
+	system("color 0f");
+
+	gotoxy(0, 3);		printf("\t< 기억력 테스트 >");
+	gotoxy(0, 7);		printf("\t 기억력을 마음껏 테스트하세요!");
+	gotoxy(0, 9);		printf("\t 6자리부터 15자리의 숫자!");
+	gotoxy(0, 11);		printf("\t 숫자 외울 시간 : 5 초");
+	gotoxy(0, 15);		printf("\t 입력 제한시간 : 3 초	");
+	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
+
+	if (_getch())
+		return;
+}
+
 
 void score_save()
 {
