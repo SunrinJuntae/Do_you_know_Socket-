@@ -23,10 +23,10 @@ int main()
 
 		while (1)
 		{
-			if (count < 1 || count > 100) // 시도 횟수가 범위를 벗어났을 때
+			if (count < 1 || count > 100)
 			{
 				printf("범위에 맞지 않습니다. 다시 입력해주세요. ");
-				scanf("%d", &count); // 다시 입력
+				scanf("%d", &count);
 			}
 			else
 				break;
@@ -35,7 +35,7 @@ int main()
 		printf("수를 입력하세요. 범위는 1부터 10000입니다. \n");
 		
 
-		for (i = 1; i <= count; i++) // 몇 번 맞출지 반복
+		for (i = 1; i <= count; i++)
 		{
 			printf("============================== \n");
 			printf("%d번째 시도 : ", i);
@@ -43,17 +43,17 @@ int main()
 
 			while (1)
 			{
-				if (input < 0 || input > 10000) // 숫자 범위를 벗어났을 때
+				if (input < 0 || input > 10000)
 				{
 					printf("범위에 맞지 않습니다. 다시 입력해주세요. ");
-					scanf("%d", &input); // 다시 입력
+					scanf("%d", &input);
 				}
 				else
 					break;
 			}
 
-			if (updown > input) // 결과 출력
-				printf("%d보다 큽니다. \n", input); 
+			if (updown > input)
+				printf("%d보다 큽니다. \n", input);
 			else if (updown < input)
 				printf("%d보다 작습니다. \n", input);
 			else if (updown == input)
@@ -61,15 +61,13 @@ int main()
 				printf("정답입니다. %d번 만에 성공하셨습니다. ", i);
 				break;
 			}
-      
 			printf("============================== \n");
 			printf("\n");
 		}
-    
-		if (updown != input) // 설정 범위 안에서 못 맞췄을 경우
+		if (updown != input)
 			printf("게임 실패! 정답은 %d였습니다.", updown);
 
-		printf("게임을 다시 하시겠습니까? (맞으면 1, 아니면 0을 입력하세요.) "); // 게임 다시 실행
+		printf("게임을 다시 하시겠습니까? (맞으면 1, 아니면 0을 입력하세요.) ");
 		scanf("%d", &again);
 
 		if (again == 1)
@@ -83,8 +81,22 @@ int main()
 			printf("게임이 종료되었습니다. \n");
 			break;
 		}
-			
+
+		while (1)
+		{
+			if (again > 1 || again < 0)
+			{
+				printf("다시 입력해주세요. ");
+				scanf("%d", &again);
+			}
+			else if (again >= 0 && again <= 1)
+			{
+				printf("게임을 다시 시작합니다. \n");
+				system("cls");
+				break;
+			}
+
+		}
 	}
 
 }
-
