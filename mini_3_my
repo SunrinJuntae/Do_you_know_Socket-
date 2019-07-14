@@ -1,3 +1,5 @@
+#pragma warning(disable 4996)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -5,55 +7,67 @@
 #include <conio.h>
 #include <string.h>
 
+void gotoxy(int x, int y)
+{
+	COORD Pos;
+	Pos.X = x;
+	Pos.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), Pos);
+}
 
 int main()
 {
-   srand(time(NULL));
+	srand(time(NULL));
 
-   int rd[16]; // 랜덤으로 배열 넣기
-   int i = 0, j = 6, k = 3; // i는 기본 반복문 j는 레벨 6부터
-   int user[16] = { 0, }; // 사용자가 넣는 배열
-   int count = 0; // 틀린 횟수
+	int rd[16]; // 랜덤으로 배열 넣기
+	int i = 0, j = 6, k = 3; // i는 기본 반복문 j는 레벨 6부터
+	int user[16] = { 0, }; // 사용자가 넣는 배열
+	int count = 0; // 틀린 횟수
 
-   for (j = 6; j < 15; j++) // level1부터 level10까지
-   {
-      Sleep(1000);
-      system("cls");
-      for (k = 3; k > 0; k--)
-      {
-         printf("level %d 시작까지 %d초 남았습니다.", j-5, k);
-         Sleep(1000);
-         system("cls");
-      }
+	for (j = 6; j < 15; j++) // level1부터 level10까지
+	{
+		Sleep(1000);
+		system("cls");
+		for (k = 3; k > 0; k--)
+		{
+			printf("level %d 시작까지 %d초 남았습니다.", j-5, k);
+			Sleep(1000);
+			system("cls");
+		}
 
-      for (i = 0; i < j; i++)
-      {
-         rd[i] = rand() % 9; // 랜덤으로 인덱스에 하나하나 받기
-         printf("%d", rd[i]);   
-      }
+		for (i = 0; i < j; i++)
+		{
+			rd[i] = rand() % 9; // 랜덤으로 인덱스에 하나하나 받기
+			printf("%d", rd[i]);	
+			
+		}
+		Sleep(5000);
+		gotoxy(0, 0); 
+		printf("                  \n");
+		
+		for (i = 0; i < j; i++)
+		{
+			user[i] = fgetc(stdin);
+		}
+		if (i > j)
+		{
+			printf("틀렸습니다! \n");
 
-      printf("\n");
-      
-      for (i = 0; i < j; i++)
-      {
-         user[i] = getche();
-      }
+		}
 
-      printf("\n");
+		printf("\n");
 
-      for (i = 0; i < j; i++)
-      {
-         
-         if (rd[i] != (user[i] - 48)) // 원소 하나하나 맞는지 판별
-         {
-            printf("틀렸습니다! \n");
-            count++;
-            break;
-         }
-      }
-      printf("\n");
-      printf("\n"); 
+		for (i = 0; i < j; i++)
+		{
+			
+			if (rd[i] != (user[i] - 48)) // 원소 하나하나 맞는지 판별
+			{
+				printf("틀렸습니다! \n");
+				count++;
+				break;
+			}
+		}
 
-   }
-   printf("맞은 갯수 %d, 틀린 갯수 %d", 10 - count, count);
+	}
+	printf("맞은 갯수 %d, 틀린 갯수 %d", 10 - count, count);
 }
