@@ -30,7 +30,7 @@
 
 #define PORT 4578
 #define PACKET_SIZE 1024
-#define COM0_IP "127.0.0.1"         //COM0 IP주소 입력
+#define COM0_IP "192.168.35.99"         //COM0 IP주소 입력
 
 SOCKET hSock, hListen;
 int score = 0;
@@ -96,7 +96,7 @@ int main()
 		system("cls");
 		for (i = 0; i < GAME_NUMBER; i++) {
 
-			if (game_start[i] == RSP) {
+			/*if (game_start[i] == RSP) {
 				tutorial_rsp();
 				fflush(stdin);
 				rsp();
@@ -114,9 +114,9 @@ int main()
 				tutorial_taza();
 				fflush(stdin);
 				taza();
-			}
+			}*/
 
-			else if (game_start[i] == WASD)
+			if (game_start[i] == WASD)
 			{
 				tutorial_wasd();
 				fflush(stdin);
@@ -879,6 +879,8 @@ int sock_main(int flag) {
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	int fin;
+	system("cls");
+	printf("******채팅******\n");
 	if (flag == FALSE) //COM0 (SERVER)
 	{
 		hListen = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -924,7 +926,6 @@ int chatting_COM0(SOCKET hCOM1)
 	bool a;
 	while (1)
 	{
-		printf("Message Recives .. \n");
 		nRcv = recv(hCOM1, message, sizeof(message) - 1, 0);          //message 받음
 
 		message[nRcv] = '\0';
@@ -935,8 +936,8 @@ int chatting_COM0(SOCKET hCOM1)
 			break;
 		}
 
-		printf("Receive Message : %s", message);
-		printf("\nSend Message : ");
+		printf("COM1 : %s", message);
+		printf("\nYOU : ");
 		fgets(message, 30, stdin);                                     //message 입력받음
 		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //q인지 판단
 		if (a == FALSE)
@@ -951,6 +952,7 @@ int chatting_COM0(SOCKET hCOM1)
 	}
 	char r_message[PACKET_SIZE];
 	recv(hCOM1, r_message, PACKET_SIZE, 0);
+	system("cls");
 	printf("COM1 SCORE : %d", r_message[0]);
 	fin = (int)r_message[0];
 	char s_message[3] = { 0 , };
@@ -970,13 +972,12 @@ int chatting_COM1(SOCKET hCOM0)
 	int nRcv, fin;
 	char message[PACKET_SIZE];
 	char indi[2] = { 'q' };                   //q를 누르면 채팅 끔
+	system("cls");
 	while (1)
 	{
-		printf("Message : ");
+		printf("\nYOU : ");
 		fgets(message, 30, stdin);
 		BOOL a = (message[0] == indi[0]) ? FALSE : TRUE;       //a 로 채팅을 끌지 말지 판단
-		printf("%s", message);
-		printf("%d", a);
 		if (a == FALSE)
 		{
 			send(hCOM0, message, strlen(message), 0);      //q를 보내 server도 채팅을 끄게 함
@@ -984,7 +985,6 @@ int chatting_COM1(SOCKET hCOM0)
 			break;
 		}
 		send(hCOM0, message, strlen(message), 0);       //message를 보냄
-		printf("Message Receives...\n");
 
 		nRcv = recv(hCOM0, message, sizeof(message) - 1, 0);        //message를 받음
 
@@ -992,11 +992,11 @@ int chatting_COM1(SOCKET hCOM0)
 		a = (message[0] == indi[0]) ? FALSE : TRUE;          //q 판단
 		if (a == FALSE)
 		{
-			printf("Close Server Connection...\n");
+			printf("Close Chatting\n");
 			break;
 		}
 
-		printf("Receive Message : %s", message);
+		printf("COM0 : %s", message);
 	}
 	char s_message[3] = { 0, };
 	s_message[0] = score;
@@ -1004,7 +1004,7 @@ int chatting_COM1(SOCKET hCOM0)
 
 	char r_message[PACKET_SIZE] = { 0, };
 	recv(hCOM0, r_message, PACKET_SIZE, 0);
-
+	system("cls");
 	printf("COM0 score : %d", r_message[0]);
 	fin = (int)r_message[0];
 
@@ -1028,8 +1028,8 @@ void sock_clean(SOCKET hSock, SOCKET hListen)
 int flag_com() {
 	system("cls");
 	int flag;
-	printf("COM1 : 1\n");                      //CLIENT
-	printf("COM0 : 0\n을 입력하세요\n");       //SERVER
+	printf("COM1(CLIENT) : 1\n");                      //CLIENT
+	printf("COM0(SERVER) : 0\n을 입력하세요\n");       //SERVER
 	scanf("%d", &flag);
 	return flag;
 }
