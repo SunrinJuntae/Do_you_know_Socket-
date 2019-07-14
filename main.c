@@ -1029,8 +1029,8 @@ int sock_score_COM(SOCKET hCOM, int flag)
 int flag_com() {
 	system("cls");
 	int flag;
-	printf("COM1 : 1\n");                   //CLIENT
-	printf("COM0 : 0\n을 입력하세요\n");       //SERVER
+	printf("COM1(SERVER) : 1\n");                   //CLIENT
+	printf("COM0(CLIENT) : 0\n을 입력하세요\n");       //SERVER
 	scanf("%d", &flag);
 	return flag;
 }
