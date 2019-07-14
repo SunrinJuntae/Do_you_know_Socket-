@@ -8,32 +8,33 @@
 #define PORT 4578
 #define PACKET_SIZE 1024
 
-int socket(SOCKET hClient);
+int message(SOCKET hClient);
 
 
 int main() {
 	WSADATA wsaData;
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
-	
+
 	SOCKET hListen;
-	hListen = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);                    //IPV4Å¸ÀÔ, ¿¬°áÁöÇâÇü ¼ÒÄÏ, TCP »ç¿ë
+	hListen = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);                    //IPV4íƒ€ì…, ì—°ê²°ì§€í–¥í˜• ì†Œì¼“, TCP ì‚¬ìš©
+
+	SOCKADDR_IN tListenAddr;						//ì†Œì¼“ êµ¬ì„±ìš”ì†Œ ë‹´ì„ êµ¬ì¡°ì²´ ìƒì„±
+	memset(&tListenAddr, 0, sizeof(SOCKADDR_IN));	                        //êµ¬ì¡°ì²´ 0ìœ¼ë¡œ ì´ˆê¸°í™”       
+	tListenAddr.sin_family = AF_INET;                                       //ì£¼ì†Œ ì •ë³´
+	tListenAddr.sin_port = htons(PORT);                                     //í¬íŠ¸ ë²ˆí˜¸
+	tListenAddr.sin_addr.s_addr = htonl(INADDR_ANY);                        //ipì£¼ì†Œ ì„¤ì • - í˜„ì¬ ë™ì‘ë˜ëŠ” ì»´í“¨í„°ì˜ ip ì£¼ì†Œ
 
 
-	SOCKADDR_IN tListenAddr = {};                                           //¼ÒÄÏ ±¸¼º¿ä¼Ò ´ãÀ» ±¸Á¶Ã¼ »ı¼º
-	tListenAddr.sin_family = AF_INET;                                       //ÁÖ¼Ò Á¤º¸
-	tListenAddr.sin_port = htons(PORT);                                     //Æ÷Æ® ¹øÈ£
-	tListenAddr.sin_addr.s_addr = htonl(INADDR_ANY);                        //ipÁÖ¼Ò ¼³Á¤ - ÇöÀç µ¿ÀÛµÇ´Â ÄÄÇ»ÅÍÀÇ ip ÁÖ¼Ò
+	bind(hListen, (SOCKADDR*)& tListenAddr, sizeof(tListenAddr));            //ì†Œìº£ì˜ ì£¼ì†Œì •ë³´ ì „ë‹¬
+	listen(hListen, SOMAXCONN);                                              //ì ‘ì† ìŠ¹ì¸
 
+	SOCKADDR_IN tClntAddr;                                                   //ì†Œì¼“ ì •ë³´ ë‹´ì„ êµ¬ì¡°ì²´ ìƒì„±
+	memset(&tClntAddr, 0, sizeof(SOCKADDR_IN));								 //êµ¬ì¡°ì²´ 0ìœ¼ë¡œ ì´ˆê¸°í™”
+	int iClntSize = sizeof(tClntAddr);
+	SOCKET hClient = accept(hListen, (SOCKADDR*)& tClntAddr, &iClntSize);    //ì ‘ì† ìš”ì²­ ìˆ˜ë½
 
-	bind(hListen, (SOCKADDR*)& tListenAddr, sizeof(tListenAddr));            //¼ÒÄ¹ÀÇ ÁÖ¼ÒÁ¤º¸ Àü´Ş
-	listen(hListen, SOMAXCONN);                                              //Á¢¼Ó ½ÂÀÎ
+	chatting(hClient);                                                         //ì±„íŒ… ì‹œì‘
 
-	SOCKADDR_IN tClntAddr = {};                                              //¼ÒÄÏ Á¤º¸ ´ãÀ» ±¸Á¶Ã¼ »ı¼º
-	int iClntSize = sizeof(tClntAddr);                                          
-	SOCKET hClient = accept(hListen, (SOCKADDR*)& tClntAddr, &iClntSize);    //Á¢¼Ó ¿äÃ» ¼ö¶ô
-	
-	socket(hClient);                                                         //Ã¤ÆÃ ½ÃÀÛ
-	 
 	closesocket(hClient);
 	closesocket(hListen);
 	WSACleanup();
@@ -41,7 +42,7 @@ int main() {
 }
 
 
-int socket(SOCKET hClient) {
+int chatting(SOCKET hClient) {
 	int nRcv, strLen;
 	char message[PACKET_SIZE];
 	char indi[2] = { 'q' };
@@ -49,10 +50,10 @@ int socket(SOCKET hClient) {
 	while (1)
 	{
 		printf("Message Recives .. \n");
-		nRcv = recv(hClient, message, sizeof(message) - 1, 0);          //message ¹ŞÀ½
+		nRcv = recv(hClient, message, sizeof(message) - 1, 0);          //message ë°›ìŒ
 
 		message[nRcv] = '\0';
-		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //message°¡ qÀÎÁö ÆÇ´ÜÇÏ±â À§ÇÔ
+		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //messageê°€ qì¸ì§€ íŒë‹¨í•˜ê¸° ìœ„í•¨
 		if (a == FALSE)
 		{
 			printf("Close\n");
@@ -61,8 +62,8 @@ int socket(SOCKET hClient) {
 
 		printf("Receive Message : %s", message);
 		printf("\nSend Message : ");
-		fgets(message, 30, stdin);                                     //message ÀÔ·Â¹ŞÀ½
-		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //qÀÎÁö ÆÇ´Ü
+		fgets(message, 30, stdin);                                     //message ì…ë ¥ë°›ìŒ
+		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //qì¸ì§€ íŒë‹¨
 		if (a == FALSE)
 		{
 			printf("Close...\n");
@@ -70,6 +71,6 @@ int socket(SOCKET hClient) {
 		}
 
 		strLen = strlen(message);
-		send(hClient, message, strLen, 0);                            //message º¸³¿
+		send(hClient, message, strLen, 0);                            //message ë³´ëƒ„
 	}
 }
