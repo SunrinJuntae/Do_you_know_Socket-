@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -5,14 +7,17 @@
 #include <windows.h>
 
 
-int i; // 반복문
-int input; // 입력받는 숫자의 갯수
 int count = 0; // 숫자 
+int input = 0; // 플레이어가 입력받는 숫자의 갯수
+int com_input = 0; // 컴퓨터의 개수
 
-void player_turn()
+
+void player_turn() // 플레이어가 부를 숫자
 {
+	int i; // 반복문
+
 	printf("숫자를 몇 개 부르시겠습니까? ");
-	scanf("%d", &input);
+	scanf("%d", &input); // 몇 개 부를지 입력
 
 	while (1)
 	{
@@ -28,7 +33,39 @@ void player_turn()
 	printf("\n");
 	printf("플레이어의 턴 : ");
 
-	for (i = 0; i < input; i++)
+	for (i = 0; i < input; i++) // 입력한 숫자만큼 반복
+	{
+		count++; // 읊는 숫자로 반복마다 +1 처리
+		printf("%d ", count);
+		Sleep(300);
+		if (count == 31) // 31이면
+		{
+			printf("\n");
+			break; // 반복문 탈출
+		}
+	}
+		
+	printf("\n");
+}
+
+void computer_turn()
+{
+	srand(time(NULL)); // 랜덤 위해서
+
+	int j; // 반복문
+
+	printf("컴퓨터의 턴 : ");
+
+	if (count < 27) // 27보다 작으면
+		com_input = rand() % 3 + 1; // 1~3 중 랜덤
+	else if (count == 27)  
+		com_input = 3; 
+	else if (count == 28)
+		com_input = 2;
+	else if (count == 29 || count == 30)
+		com_input = 1;
+
+	for (j = 0; j < com_input; j++) // 컴퓨터의 랜덤으로 뽑힌 숫자만큼 반복
 	{
 		count++;
 		printf("%d ", count);
@@ -36,21 +73,116 @@ void player_turn()
 		if (count == 31)
 		{
 			printf("\n");
-			printf("게임이 종료되었습니다. ");
-			Sleep(100);
-			exit(0);
+			break;
 		}
-
 	}
-
 	printf("\n");
-	
 }
-
 
 int main()
 {
 	srand(time(NULL)); // 랜덤 위해서
-	while(1)
-		player_turn();
+	int again; // 반복 위해서
+	int start; // 순서 정하기
+
+
+	while (1)
+	{
+		count = 0;
+
+		start = rand() % 2;
+
+		if (start == 0) // 0일 때 플레이어의 선공
+		{
+			printf("플레이어의 선공입니다. \n");
+			printf("\n");
+
+			while (1)
+			{
+				printf("============================== \n");
+				player_turn();
+
+				if (count == 31) // 플레이어가 31이면
+				{
+					printf("게임이 끝났습니다. ");
+					printf("컴퓨터의 승리! \n");
+					break;
+				}
+
+				computer_turn();
+				printf("============================== \n");
+				printf("\n");
+
+
+				if (count == 31) // 컴퓨터가 31이면
+				{
+					printf("게임이 끝났습니다. ");
+					printf("플레이어의 승리! \n");
+					break;
+				}
+
+			}
+		}
+
+		else if (start == 1) // 1일 때의 컴퓨터 선공
+		{
+			printf("컴퓨터의 선공입니다. \n");
+			printf("\n");
+			while (1)
+			{
+				printf("============================== \n");
+				computer_turn(); 
+
+				if (count == 31) // 컴퓨터가 31이면
+				{
+					printf("게임이 끝났습니다. ");
+					printf("플레이어의 승리! \n");
+					break;
+				}
+
+				player_turn();
+				printf("============================== \n");
+				printf("\n");
+
+				if (count == 31) // 플레이어가 31이면
+				{
+					printf("게임이 끝났습니다. ");
+					printf("컴퓨터의 승리! \n");
+					break;
+				}
+			}
+		}
+
+		printf("\n");
+		
+		printf("게임을 다시 하시겠습니까? (맞으면 1, 아니면 0을 입력하세요.) ");
+		scanf("%d", &again); // 게임 반복
+
+		if (again == 1)
+		{
+			printf("게임을 다시 시작합니다. \n");
+			system("cls");
+		}
+
+		else if (again == 0)
+		{
+			printf("게임이 종료되었습니다. \n");
+			break;
+		}
+
+		while (1)
+		{
+			if (again > 1 || again < 0)
+			{
+				printf("다시 입력해주세요. ");
+				scanf("%d", &again);
+			}
+			else if (again >= 0 && again <=1)
+			{
+				printf("게임을 다시 시작합니다. \n");
+				system("cls");
+				break;
+			}
+		}
+	}
 }
