@@ -32,7 +32,7 @@
 
 #define PORT 4578
 #define PACKET_SIZE 1024
-#define COM0_IP "192.168.35.99"         //COM0 IP주소 입력
+#define COM0_IP "127.0.0.1"         //COM0 IP주소 입력
 
 SOCKET hSock, hListen;
 int score = 0;
@@ -104,12 +104,13 @@ int main()
 	{
 		system("cls");
 		for (i = 0; i < GAME_NUMBER; i++) {
-
+			/*
 			if (game_start[i] == RSP) {
 				tutorial_rsp();
 				fflush(stdin);
 				rsp();
 			}
+
 			else if (game_start[i] == TIMING)
 			{
 				tutorial_timing();
@@ -140,7 +141,7 @@ int main()
 				tutorial_memory();
 				fflush(stdin);
 				memory();
-			}
+			}*/
 		}
 
 		int fin = sock_main(flag);
@@ -763,7 +764,7 @@ void memory()
 
 
 
-	for (j = 6; j < 15; j++) // level1부터 level10까지
+	for (j = 6; j < 10; j++) // level1부터 level10까지
 	{
 		Sleep(1000);
 		system("cls");
@@ -1055,7 +1056,7 @@ void tutorial_memory()
 
 	gotoxy(0, 3);		printf("\t< 기억력 테스트 >");
 	gotoxy(0, 7);		printf("\t 기억력을 마음껏 테스트하세요!");
-	gotoxy(0, 9);		printf("\t 6자리부터 15자리의 숫자!");
+	gotoxy(0, 9);		printf("\t 6자리부터 10자리의 숫자!");
 	gotoxy(0, 11);		printf("\t 숫자 외울 시간 : 5 초");
 	gotoxy(0, 15);		printf("\t 입력 제한시간 : 3 초	");
 	gotoxy(0, 20);		printf("\t시작하려면 아무키나 누르세요...");
@@ -1142,22 +1143,37 @@ int chatting_COM0(SOCKET hCOM1)
 {
 	int fin;
 	int nRcv, strLen;
-	char message[PACKET_SIZE];
+	char message[PACKET_SIZE], recv_message[PACKET_SIZE];
 	char indi[2] = { 'q' };
 	bool a;
+	int cnt = 0;
 	while (1)
 	{
-		_beginthread(chatting_recv, 0, hCOM1);
-		printf("\nYOU : ");
-		fgets(message, 30, stdin);                                     //message 입력받음
-		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //q인지 판단
+		if (cnt == 0 || cnt == 1) {
+			system("cls");
+		}
+		nRcv = recv(hCOM1, recv_message, sizeof(recv_message) - 1, 0);        //message를 받음
+
+		recv_message[nRcv] = '\0';                     //메세지 뒤에 널문자 붙여줌
+		a = (recv_message[0] == indi[0]) ? FALSE : TRUE;          //q 판단
 		if (a == FALSE)
 		{
-			printf("\nClose...\n");
-			send(hCOM1, message, strlen(message), 0);
+			printf("\nClose Chatting\n");
 			break;
 		}
 
+		printf("OPPOSITE : %s", recv_message);
+		printf("YOU : ");
+		fgets(message, 30, stdin);                                     //message 입력받음
+		/*printf("\b");*/
+		a = (message[0] == indi[0]) ? FALSE : TRUE;                    //q인지 판단
+		if (a == FALSE)
+		{
+			printf("\nClose... Chatting\n");
+			send(hCOM1, message, strlen(message), 0);
+			break;
+		}
+		cnt++;
 		strLen = strlen(message);
 		send(hCOM1, message, strLen, 0);                            //message 보냄
 	}
@@ -1181,14 +1197,20 @@ int chatting_COM0(SOCKET hCOM1)
 int chatting_COM1(SOCKET hCOM0)
 {                //채팅 부분
 	int nRcv, fin;
-	char message[PACKET_SIZE];
+	char message[PACKET_SIZE], recv_message[PACKET_SIZE];
 	char indi[2] = { 'q' };                   //q를 누르면 채팅 끔
+	int cnt = 0;
+	bool a;
 	system("cls");
 	while (1)
 	{
-		printf("\nYOU : ");
+		if (cnt == 0 || cnt == 1) {
+			system("cls");
+		}
+		printf("YOU : ");
 		fgets(message, 30, stdin);
-		BOOL a = (message[0] == indi[0]) ? FALSE : TRUE;       //a 로 채팅을 끌지 말지 판단
+		/*printf("\b");*/
+		a = (message[0] == indi[0]) ? FALSE : TRUE;       //a 로 채팅을 끌지 말지 판단
 		if (a == FALSE)
 		{
 			send(hCOM0, message, strlen(message), 0);      //q를 보내 server도 채팅을 끄게 함
@@ -1197,7 +1219,18 @@ int chatting_COM1(SOCKET hCOM0)
 		}
 		send(hCOM0, message, strlen(message), 0);       //message를 보냄
 
-		_beginthread(chatting_recv, 0, hCOM0);
+		nRcv = recv(hCOM0, recv_message, sizeof(recv_message) - 1, 0);        //message를 받음
+
+		recv_message[nRcv] = '\0';                     //메세지 뒤에 널문자 붙여줌
+		a = (recv_message[0] == indi[0]) ? FALSE : TRUE;          //q 판단
+		if (a == FALSE)
+		{
+			printf("\nClose Server Connection...\n");
+			break;
+		}
+
+		printf("OPPOSITE : %s", recv_message);
+		cnt++;
 	}
 	char s_message[3] = { 0, };
 	s_message[0] = score;
